@@ -4,20 +4,17 @@ using WindowPositionsToggle.Models;
 
 namespace WindowPositionsToggle.WindowHelpers;
 
-public class WindowInformationParser(ILogger logger, XDoToolWrapper xDoToolWrapper)
+public class WindowInformationParser(ILogger logger, XDoToolWrapper xDoToolWrapper, WmCtrlWrapper wmCtrlWrapper)
 {
     public WindowInformation GetFocusedWindow()
     {
         var toolReturnLines = xDoToolWrapper.RunXDoTool($"getactivewindow getwindowgeometry");
         var windowTitleToolReturnLines = xDoToolWrapper.RunXDoTool($"getactivewindow getwindowname");
+        var wmCtrlLines = wmCtrlWrapper.RunWmCtrl("-lx");
 
-        logger.Debug("[Xdotool RAW COMMAND RETURN START]");
-        foreach (var returnLine in toolReturnLines)
-        {
-            logger.Debug("{Line}", returnLine);
-        }
-        logger.Debug("[Xdotool RAW COMMAND RETURN END]");
-
+        // Comment this out most of the time
+        // printDebugRawLines(wmCtrlLines);
+        
         if (toolReturnLines.Length < 1)
             return new WindowInformation(-1);
 
@@ -28,10 +25,56 @@ public class WindowInformationParser(ILogger logger, XDoToolWrapper xDoToolWrapp
         setActiveWindowSize(activeWindow, toolReturnLines);
         
         activeWindow.Title = windowTitleToolReturnLines[0];
+        
+        activeWindow.Class = parseWindowClass(wmCtrlLines);
 
         return activeWindow;
     }
 
+    private string parseWindowClass(string[] wmCtrlLines)
+    {
+        var allWindowsLines = wmCtrlWrapper.RunWmCtrl("-lx");
+
+        var windowClass = "";
+   
+        // Match process ID on line (It'll be in hex)
+        
+        // Parse class from that
+        
+        return
+    }
+
+    private void printDebugRawLines(string[] toolReturnLines)
+    {
+        logger.Debug("[Tool RAW COMMAND RETURN START]");
+        foreach (var returnLine in toolReturnLines)
+        {
+            logger.Debug("{Line}", returnLine);
+        }
+        logger.Debug("[Tool RAW COMMAND RETURN END]");
+
+    }
+
+    private static void setWindowClass(WindowInformation activeWindow, string[] toolReturnLines)
+    {
+        foreach (var returnLine in toolReturnLines)
+        {
+            var trimmedLine = returnLine.Trim();
+            
+            if (!trimmedLine.StartsWith("Geometry", StringComparison.InvariantCultureIgnoreCase)) continue;
+            
+            // Otherwise:
+            var windowGeomtryRaw = trimmedLine.Replace("Geometry: ", "", StringComparison.InvariantCultureIgnoreCase);
+
+            if (activeWindow is null) throw new NullReferenceException();
+            
+            var geometries = windowGeomtryRaw.Split('x');
+            
+            activeWindow.Position.Width = long.Parse(geometries[0]);
+            activeWindow.Position.Height = long.Parse(geometries[1]);
+        }
+    }
+    
     private static void setActiveWindowSize(WindowInformation activeWindow, string[] toolReturnLines)
     {
         foreach (var returnLine in toolReturnLines)
@@ -47,8 +90,8 @@ public class WindowInformationParser(ILogger logger, XDoToolWrapper xDoToolWrapp
             
             var geometries = windowGeomtryRaw.Split('x');
             
-            activeWindow.Width = long.Parse(geometries[0]);
-            activeWindow.Height = long.Parse(geometries[1]);
+            activeWindow.Position.Width = long.Parse(geometries[0]);
+            activeWindow.Position.Height = long.Parse(geometries[1]);
         }
     }
 
@@ -71,8 +114,8 @@ public class WindowInformationParser(ILogger logger, XDoToolWrapper xDoToolWrapp
             
             var positions = positionsRaw.Split(',');
             
-            activeWindow.Left = long.Parse(positions[0]);
-            activeWindow.Top = long.Parse(positions[1]);
+            activeWindow.Position.Left = long.Parse(positions[0]);
+            activeWindow.Position.Top = long.Parse(positions[1]);
         }
     }
 

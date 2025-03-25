@@ -3,6 +3,11 @@ Using (currently) xdotool to snap my windows into the positions I want automatic
 
 # Prerequisites
 ```
-sudo apt install xdotool -y
+sudo apt install wmctrl -y
+```
+
+## If you want an easy way to call the script with a hotkey:
+```
 sudo apt install xbindkeys -y
 ```
+

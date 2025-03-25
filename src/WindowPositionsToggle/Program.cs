@@ -191,7 +191,7 @@ internal static class Program
             var correctedWindowTop = matchingWindowPosition.Top + offsetTop+ windowPreference.ExtraTopOffset;
             var preferredTop = windowPreference.PreferredPositions[i].Top;
 
-            var correctedWindowLeft = matchingWindowPosition.Left + offsetLeft; // + windowPreference.ExtraLeftOffset;
+            var correctedWindowLeft = matchingWindowPosition.Left + offsetLeft + windowPreference.ExtraLeftOffset;
             var preferredLeft = windowPreference.PreferredPositions[i].Left;
              
             if (windowPreference.LeftTopScalingMultiple != 1.0m)

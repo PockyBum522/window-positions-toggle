@@ -62,6 +62,17 @@ internal static class Program
 
     private static void moveWindowToAppropriateLocation(WindowInformation windowToMove)
     {
+        // We are now going to have to:
+        
+        //      Deserialize saved preferences
+        
+        //      Pass along the SavedWindowPreferences that matches the class of active window
+        
+        //      Use that to calculate offset - No offset if it's a 0.5x scaling app
+        
+        //      Use that to calculate how to handle reported position - Halve reported position before working with it
+        
+        
         var userSavedPreferences = loadJsonSavedConfiguration(UserPreferencesFullPath);
         
         if (_classIgnoreList.Contains(windowToMove.Class, StringComparer.InvariantCultureIgnoreCase))
@@ -91,7 +102,7 @@ internal static class Program
     {
         var savedPositions = getSavedMatchingPositions(windowToMatchPidOf.Class, userSavedPreferences);
 
-        var currentWindowIndex = getSavedIndexOf(windowToMatchPidOf.Position, savedPositions); //getSavedIndexesOf(existingMatchingWindowPositions, savedPositions);
+        var currentWindowIndex = getSavedIndexOf(windowToMatchPidOf.Position, userSavedPreferences); //getSavedIndexesOf(existingMatchingWindowPositions, savedPositions);
 
         var nextPosition = getPositionAtNextIndexAfter(currentWindowIndex, savedPositions);
         
@@ -142,7 +153,7 @@ internal static class Program
         throw new Exception("No such window exists");
     }
 
-    private static int getSavedIndexOf(WindowPosition matchingWindowPosition, List<WindowPosition> preferredWindowPositions)
+    private static int getSavedIndexOf(WindowPosition matchingWindowPosition, List<SavedWindowPreferences> userSavedPreferences)
     {
         for (var i = preferredWindowPositions.Count - 1; i >= 0; i--)
         {
@@ -228,6 +239,8 @@ internal static class Program
         
         dummyWindow01.TitlePattern = "Title Pattern Dummy Window 01 Title";
         dummyWindow01.ClassPattern = "Class Pattern Dummy Window 01 Class";
+        
+        dummyWindow01.LeftTopScalingMultiple = 2.0m;
         
         dummyWindow01.PreferredPositions.Add(
             new WindowPosition(200, 200, 10, 20));

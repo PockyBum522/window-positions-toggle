@@ -4,28 +4,29 @@ using WindowPositionsToggle.Models;
 
 namespace WindowPositionsToggle.WindowHelpers;
 
-public class WmCtrlWrapper
+public class ShellCommandWrapper
 {
     private readonly ILogger _logger;
     
     private Process _toolProcess = new();
     
-    public WmCtrlWrapper(ILogger logger)
+    public ShellCommandWrapper(ILogger logger)
     {
         _logger = logger;
         
-        _toolProcess.StartInfo.FileName = "wmctrl";
         _toolProcess.StartInfo.UseShellExecute = false;
         _toolProcess.StartInfo.RedirectStandardOutput = true;
         _toolProcess.StartInfo.CreateNoWindow = true;
     }
     
-    public string[] RunWmCtrl(string arguments)
+    public string[] RunInShell(string command, string arguments)
     {
         // Note to self - Taking try catch out of here to see how fast I can make this, then may want to add back in 
         //      and see how it slows, if any
 
-        _logger.Debug("[Wmctrl] About to run with args: {Arguments}", arguments);
+        _toolProcess.StartInfo.FileName = command;
+        
+        _logger.Debug("[{CommandName}] About to run with args: {Arguments}", command, arguments);
 
         _toolProcess.StartInfo.Arguments = arguments;        
 
@@ -35,7 +36,7 @@ public class WmCtrlWrapper
         
         _toolProcess.WaitForExit();
         
-        _logger.Debug("[Wmctrl] Ran with args: {Arguments}", arguments);
+        _logger.Debug("[{CommandName}] Ran with args: {Arguments}", command, arguments);
         
         return rawLines;
     }

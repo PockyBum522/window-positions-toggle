@@ -91,7 +91,7 @@ internal static class Program
     {
         var savedPositions = getSavedMatchingPositions(windowToMatchPidOf.Class, userSavedPreferences);
 
-        var currentWindowIndex = getSavedIndexeOf(windowToMatchPidOf.Position, savedPositions); //getSavedIndexesOf(existingMatchingWindowPositions, savedPositions);
+        var currentWindowIndex = getSavedIndexOf(windowToMatchPidOf.Position, savedPositions); //getSavedIndexesOf(existingMatchingWindowPositions, savedPositions);
 
         var nextPosition = getPositionAtNextIndexAfter(currentWindowIndex, savedPositions);
         
@@ -142,7 +142,7 @@ internal static class Program
         throw new Exception("No such window exists");
     }
 
-    private static int getSavedIndexeOf(WindowPosition matchingWindowPosition, List<WindowPosition> preferredWindowPositions)
+    private static int getSavedIndexOf(WindowPosition matchingWindowPosition, List<WindowPosition> preferredWindowPositions)
     {
         for (var i = preferredWindowPositions.Count - 1; i >= 0; i--)
         {

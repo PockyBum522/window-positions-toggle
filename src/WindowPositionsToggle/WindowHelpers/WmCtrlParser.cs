@@ -6,7 +6,7 @@ namespace WindowPositionsToggle.WindowHelpers;
 
 public class WmCtrlParser(ILogger logger)
 {
-    private ShellCommandWrapper _shellCommandWrapper = new(logger);
+    private readonly ShellCommandWrapper _shellCommandWrapper = new(logger);
 
     public WindowInformation GetActiveWindowInformation()
     {
@@ -18,9 +18,10 @@ public class WmCtrlParser(ILogger logger)
 
         if (returnInformation.Length < 1)
         {
-            var returnWindow = new WindowInformation(-1);
-
-            returnWindow.Class = "ERROR";
+            var returnWindow = new WindowInformation(-1)
+            {
+                Class = "ERROR"
+            };
 
             return returnWindow;
         }
@@ -43,63 +44,9 @@ public class WmCtrlParser(ILogger logger)
     {
         returnMatchedWindow.Position = GetWindowPositionMatchingPid(returnMatchedWindow.Id);
     }
-
-    public List<WindowPosition> GetExistingWindowPositionsMatchingClass(string windowClassNeedle)
-    {
-        var matchingWindowPids = GetAllIdsMatchingWindowClass(windowClassNeedle);
-
-        var existingWindowPositions = new List<WindowPosition>();
-        
-        foreach (var matchingPid in matchingWindowPids)
-        {
-            existingWindowPositions.Add(GetWindowPositionMatchingPid(matchingPid));
-        }
-
-        return existingWindowPositions;
-    }
     
-    public List<long> GetAllIdsMatchingWindowClass(string windowClassNeedle)
-    {
-        var returnIds = new List<long>();
-
-        var wmCtrlLines = _shellCommandWrapper.RunInShell("wmctrl", "-lx");
-
-        foreach (var line in wmCtrlLines)
-        {
-            var splitLine = line.Split(Array.Empty<char>(), StringSplitOptions.RemoveEmptyEntries);
-
-            var classOnLine = splitLine[2].Trim();
-
-            var checkForMachineNameAtPosition = 3;
-
-            // Handle spaces in class names
-            while (!splitLine[checkForMachineNameAtPosition].Contains(Environment.MachineName))
-            {
-                classOnLine += " ";
-                classOnLine += splitLine[checkForMachineNameAtPosition].Trim();
-                
-                checkForMachineNameAtPosition++;
-            }
-
-            var classMatchedOnLine = classOnLine.Contains(windowClassNeedle, StringComparison.InvariantCultureIgnoreCase);
-            
-            if (!classMatchedOnLine) continue;
-            
-            // Otherwise:
-            var processIdTrimmed = splitLine[0].Trim();
-            
-            var convertedToDecimal = Convert.ToInt32(processIdTrimmed, 16);
-
-            returnIds.Add(convertedToDecimal);
-        }
-
-        return returnIds;
-    }
-
     public WindowPosition GetWindowPositionMatchingPid(long windowPidNeedle)
     {
-        var returnPositions = new List<WindowPosition>();
-
         var wmCtrlLines = _shellCommandWrapper.RunInShell("wmctrl", "-lG");
 
         foreach (var line in wmCtrlLines)
@@ -163,7 +110,7 @@ public class WmCtrlParser(ILogger logger)
 
         foreach (var line in wmCtrlLines)
         {
-            var splitLine = line.Split(new char[0], StringSplitOptions.RemoveEmptyEntries);
+            var splitLine = line.Split(Array.Empty<char>(), StringSplitOptions.RemoveEmptyEntries);
             
             var processIdTrimmed = splitLine[0].Trim();
             

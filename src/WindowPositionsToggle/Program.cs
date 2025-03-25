@@ -86,8 +86,6 @@ internal static class Program
     
     private static void incrementMatchingWindowToNextPosition(WindowInformation windowToMatchPidOf, List<SavedWindowPreferences> userSavedPreferences)
     {
-        var existingMatchingWindowPositions = _wmCtrlParser.GetWindowPositionMatchingPid(windowToMatchPidOf.Id);
-        
         var savedPositions = getSavedMatchingPositions(windowToMatchPidOf.Class, userSavedPreferences);
 
         var currentWindowIndex = getSavedIndexeOf(windowToMatchPidOf.Position, savedPositions); //getSavedIndexesOf(existingMatchingWindowPositions, savedPositions);
@@ -109,36 +107,6 @@ internal static class Program
         moveWindowByPid(windowToMatchPidOf.Id, nextPosition);
     }
     
-    // private static void incrementMatchingClassWindowsToNextPosition(WindowInformation windowToMatchClassOf, List<SavedWindowPreferences> userSavedPreferences)
-    // {
-    //     var existingMatchingWindowPositions = _wmCtrlParser.GetExistingWindowPositionsMatchingClass(windowToMatchClassOf.Class);
-    //     
-    //     var savedPositions = getSavedMatchingPositions(windowToMatchClassOf.Class, userSavedPreferences);
-    //     
-    //     var currentWindowIndexes = getSavedIndexesOf(existingMatchingWindowPositions, savedPositions);
-    //
-    //     if (currentWindowIndexes.Any(x => x == -1))
-    //     {
-    //         // Move windows to first position
-    //
-    //         var nextPosition = getPositionAtNextIndexAfter(-1, savedPositions);
-    //         
-    //         moveWindowsByClass(windowToMatchClassOf.Class, nextPosition);
-    //         
-    //         return;
-    //     }
-    //     
-    //     // If they all match tho
-    //     if (currentWindowIndexes.All(x => x == currentWindowIndexes[0]))
-    //     {
-    //         // Move windows to next position
-    //
-    //         var nextPosition = getPositionAtNextIndexAfter(currentWindowIndexes[0], savedPositions);
-    //
-    //         moveWindowsByClass(windowToMatchClassOf.Class, nextPosition);
-    //     }
-    // }
-
     private static void moveWindowByPid(long windowPid, WindowPosition newPosition)
     {
         var hexPid = ProcessIdHelpers.LongIdToHexLeadingZero(windowPid);
@@ -147,17 +115,6 @@ internal static class Program
             "wmctrl", $"-ir {hexPid} -e 0,{newPosition.Left},{newPosition.Top},{newPosition.Width},{newPosition.Height}");
     }
     
-    // private static void moveWindowsByClass(string windowClass, WindowPosition newPosition)
-    // {
-    //     var pidsToWork = _wmCtrlParser.GetAllIdsMatchingWindowClass(windowClass);
-    //
-    //     foreach (var pidToWork in pidsToWork)
-    //     {
-    //         _shellCommandWrapper.RunInShell(
-    //             "wmctrl", $"-ir {pidToWork} -e 0,{newPosition.Left},{newPosition.Top},{newPosition.Width},{newPosition.Height}");
-    //     }
-    // }
-
     private static WindowPosition getPositionAtNextIndexAfter(int priorIndex, List<WindowPosition> preferredWindowPositions)
     {
         if (priorIndex < 0)
@@ -180,19 +137,6 @@ internal static class Program
         }
         
         throw new Exception("No such window exists");
-    }
-
-    private static List<int> getSavedIndexesOf(List<WindowPosition> matchingClassWindowPositions, List<WindowPosition> preferredWindowPositions)
-    {
-        var indexes = new List<int>();
-
-        foreach (var matchingWindowPosition in matchingClassWindowPositions)
-        {
-            indexes.Add(
-                getSavedIndexeOf(matchingWindowPosition, preferredWindowPositions));
-        }
-        
-        return indexes;
     }
 
     private static int getSavedIndexeOf(WindowPosition matchingWindowPosition, List<WindowPosition> preferredWindowPositions)
@@ -251,6 +195,8 @@ internal static class Program
         return returnWindowPreferences ?? [];
     }
     
+    
+    // ReSharper disable once UnusedMember.Local because it is useful if someone wants to see how to save out window preferences JSON file
     private static void saveDummyWindowState()
     {
         var listToSave = new List<SavedWindowPreferences>();

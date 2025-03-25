@@ -1,4 +1,3 @@
-using Serilog;
 using WindowPositionsToggle.WindowHelpers;
 
 namespace WindowPositionsToggle.Models;

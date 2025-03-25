@@ -15,7 +15,7 @@ public class ProcessIdHelpers
     {
         var trimmedHex = hexProcessId.Trim();
         
-        trimmedHex = hexProcessId.Trim('\'');
+        trimmedHex = trimmedHex.Trim('\'');
         
         return Convert.ToInt32(trimmedHex, 16);
     }

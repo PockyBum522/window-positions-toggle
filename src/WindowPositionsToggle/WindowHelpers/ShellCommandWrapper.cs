@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using Serilog;
-using WindowPositionsToggle.Models;
 
 namespace WindowPositionsToggle.WindowHelpers;
 

@@ -16,6 +16,8 @@ When run, the app will look for a class match in the JSON file, once it finds on
 
 If the app is already at one of the PreferredPositions, it will always move the focused window to the next PreferredPosition on the next run of the app. If it is at none of the PreferredPositions when run, it will snap the focused window to the first PreferredPosition
 
+## Calculating offsets:
+Take a look in getSavedIndexOf() in Program.cs. Offsets can be calculated by setting a program using the app and JSON file, then running wmctrl -lG and seeing what the reported Left and Top are vs. what values you set with the JSON config. I already have per-machine handling in that file for my laptop vs my desktop since both use different dpi scaling. Modify with your offsets.
 
 # Installation
 

@@ -69,7 +69,7 @@ internal static class Program
             
         if (windowClassInSaved(windowToMove))
         {
-            incrementMatchingClassWindowsToNextPosition(windowToMove, userSavedPreferences);
+            incrementMatchingWindowToNextPosition(windowToMove, userSavedPreferences);
         }
         else
         {
@@ -77,53 +77,86 @@ internal static class Program
         }
     }
 
-    private static void moveNotFoundWindowsToDefaultPosition(WindowInformation windowToMatchClassOf)
+    private static void moveNotFoundWindowsToDefaultPosition(WindowInformation windowToMatchPidOf)
     {
         var nextPosition = new WindowPosition(5000, 2000, 1400, 800);
         
-        moveWindowsByClass(windowToMatchClassOf.Class, nextPosition);
+        moveWindowByPid(windowToMatchPidOf.Id, nextPosition);
     }
-
-    private static void incrementMatchingClassWindowsToNextPosition(WindowInformation windowToMatchClassOf, List<SavedWindowPreferences> userSavedPreferences)
+    
+    private static void incrementMatchingWindowToNextPosition(WindowInformation windowToMatchPidOf, List<SavedWindowPreferences> userSavedPreferences)
     {
-        var existingMatchingWindowPositions = _wmCtrlParser.GetExistingWindowPositionsMatchingClass(windowToMatchClassOf.Class);
+        var existingMatchingWindowPositions = _wmCtrlParser.GetWindowPositionMatchingPid(windowToMatchPidOf.Id);
         
-        var savedPositions = getSavedMatchingPositions(windowToMatchClassOf.Class, userSavedPreferences);
-        
-        var currentWindowIndexes = getSavedIndexesOf(existingMatchingWindowPositions, savedPositions);
+        var savedPositions = getSavedMatchingPositions(windowToMatchPidOf.Class, userSavedPreferences);
 
-        if (currentWindowIndexes.Any(x => x == -1))
+        var currentWindowIndex = getSavedIndexeOf(windowToMatchPidOf.Position, savedPositions); //getSavedIndexesOf(existingMatchingWindowPositions, savedPositions);
+
+        var nextPosition = getPositionAtNextIndexAfter(currentWindowIndex, savedPositions);
+        
+        if (currentWindowIndex == -1)
         {
             // Move windows to first position
-
-            var nextPosition = getPositionAtNextIndexAfter(-1, savedPositions);
             
-            moveWindowsByClass(windowToMatchClassOf.Class, nextPosition);
+            moveWindowByPid(windowToMatchPidOf.Id, nextPosition);
             
             return;
         }
         
-        // If they all match tho
-        if (currentWindowIndexes.All(x => x == currentWindowIndexes[0]))
-        {
-            // Move windows to next position
+        // Move windows to next position
+        nextPosition = getPositionAtNextIndexAfter(currentWindowIndex, savedPositions);
 
-            var nextPosition = getPositionAtNextIndexAfter(currentWindowIndexes[0], savedPositions);
-
-            moveWindowsByClass(windowToMatchClassOf.Class, nextPosition);
-        }
+        moveWindowByPid(windowToMatchPidOf.Id, nextPosition);
     }
+    
+    // private static void incrementMatchingClassWindowsToNextPosition(WindowInformation windowToMatchClassOf, List<SavedWindowPreferences> userSavedPreferences)
+    // {
+    //     var existingMatchingWindowPositions = _wmCtrlParser.GetExistingWindowPositionsMatchingClass(windowToMatchClassOf.Class);
+    //     
+    //     var savedPositions = getSavedMatchingPositions(windowToMatchClassOf.Class, userSavedPreferences);
+    //     
+    //     var currentWindowIndexes = getSavedIndexesOf(existingMatchingWindowPositions, savedPositions);
+    //
+    //     if (currentWindowIndexes.Any(x => x == -1))
+    //     {
+    //         // Move windows to first position
+    //
+    //         var nextPosition = getPositionAtNextIndexAfter(-1, savedPositions);
+    //         
+    //         moveWindowsByClass(windowToMatchClassOf.Class, nextPosition);
+    //         
+    //         return;
+    //     }
+    //     
+    //     // If they all match tho
+    //     if (currentWindowIndexes.All(x => x == currentWindowIndexes[0]))
+    //     {
+    //         // Move windows to next position
+    //
+    //         var nextPosition = getPositionAtNextIndexAfter(currentWindowIndexes[0], savedPositions);
+    //
+    //         moveWindowsByClass(windowToMatchClassOf.Class, nextPosition);
+    //     }
+    // }
 
-    private static void moveWindowsByClass(string windowClass, WindowPosition newPosition)
+    private static void moveWindowByPid(long windowPid, WindowPosition newPosition)
     {
-        var pidsToWork = _wmCtrlParser.GetAllIdsMatchingWindowClass(windowClass);
-
-        foreach (var pidToWork in pidsToWork)
-        {
-            _shellCommandWrapper.RunInShell(
-                "wmctrl", $"-ir {pidToWork} -e 0,{newPosition.Left},{newPosition.Top},{newPosition.Width},{newPosition.Height}");
-        }
+        var hexPid = ProcessIdHelpers.LongIdToHexLeadingZero(windowPid);
+        
+        _shellCommandWrapper.RunInShell(
+            "wmctrl", $"-ir {hexPid} -e 0,{newPosition.Left},{newPosition.Top},{newPosition.Width},{newPosition.Height}");
     }
+    
+    // private static void moveWindowsByClass(string windowClass, WindowPosition newPosition)
+    // {
+    //     var pidsToWork = _wmCtrlParser.GetAllIdsMatchingWindowClass(windowClass);
+    //
+    //     foreach (var pidToWork in pidsToWork)
+    //     {
+    //         _shellCommandWrapper.RunInShell(
+    //             "wmctrl", $"-ir {pidToWork} -e 0,{newPosition.Left},{newPosition.Top},{newPosition.Width},{newPosition.Height}");
+    //     }
+    // }
 
     private static WindowPosition getPositionAtNextIndexAfter(int priorIndex, List<WindowPosition> preferredWindowPositions)
     {

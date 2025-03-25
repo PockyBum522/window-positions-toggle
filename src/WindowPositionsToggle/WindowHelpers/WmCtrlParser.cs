@@ -41,7 +41,7 @@ public class WmCtrlParser(ILogger logger)
 
     private void addWindowCurrentLocation(WindowInformation returnMatchedWindow)
     {
-        returnMatchedWindow.Position = getWindowPositionMatchingPid(returnMatchedWindow.Id);
+        returnMatchedWindow.Position = GetWindowPositionMatchingPid(returnMatchedWindow.Id);
     }
 
     public List<WindowPosition> GetExistingWindowPositionsMatchingClass(string windowClassNeedle)
@@ -52,7 +52,7 @@ public class WmCtrlParser(ILogger logger)
         
         foreach (var matchingPid in matchingWindowPids)
         {
-            existingWindowPositions.Add(getWindowPositionMatchingPid(matchingPid));
+            existingWindowPositions.Add(GetWindowPositionMatchingPid(matchingPid));
         }
 
         return existingWindowPositions;
@@ -70,6 +70,17 @@ public class WmCtrlParser(ILogger logger)
 
             var classOnLine = splitLine[2].Trim();
 
+            var checkForMachineNameAtPosition = 3;
+
+            // Handle spaces in class names
+            while (!splitLine[checkForMachineNameAtPosition].Contains(Environment.MachineName))
+            {
+                classOnLine += " ";
+                classOnLine += splitLine[checkForMachineNameAtPosition].Trim();
+                
+                checkForMachineNameAtPosition++;
+            }
+
             var classMatchedOnLine = classOnLine.Contains(windowClassNeedle, StringComparison.InvariantCultureIgnoreCase);
             
             if (!classMatchedOnLine) continue;
@@ -85,7 +96,7 @@ public class WmCtrlParser(ILogger logger)
         return returnIds;
     }
 
-    private WindowPosition getWindowPositionMatchingPid(long windowPidNeedle)
+    public WindowPosition GetWindowPositionMatchingPid(long windowPidNeedle)
     {
         var returnPositions = new List<WindowPosition>();
 
@@ -162,6 +173,17 @@ public class WmCtrlParser(ILogger logger)
             
             // Otherwise, found it:
             returnMatchedWindow.Class = splitLine[2].Trim();
+            
+            var checkForMachineNameAtPosition = 3;
+
+            // Handle spaces in class names
+            while (!splitLine[checkForMachineNameAtPosition].Contains(Environment.MachineName))
+            {
+                returnMatchedWindow.Class += " ";
+                returnMatchedWindow.Class += splitLine[checkForMachineNameAtPosition].Trim();
+                
+                checkForMachineNameAtPosition++;
+            }
 
             return;
         }

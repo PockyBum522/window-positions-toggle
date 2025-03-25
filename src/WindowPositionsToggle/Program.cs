@@ -20,6 +20,9 @@ internal static class Program
     
     internal static async Task Main(string[] args)
     {
+        if (!File.Exists(UserPreferencesFullPath))
+            saveDummyWindowState();
+        
         foreach (var arg in args)
             Console.WriteLine($"Arg: {arg}");
         
@@ -227,9 +230,9 @@ internal static class Program
             new WindowPosition(400, 400, 10, 20));
         
         listToSave.Add(dummyWindow02);
-        
-        
-        var windowInformationFilePath = Path.Join(_userDesktopPath, "saved-window-prefs-dummy.json");
+
+
+        var windowInformationFilePath = UserPreferencesFullPath;
         
         var windowJson = JsonConvert.SerializeObject(listToSave, Formatting.Indented);
         

@@ -148,13 +148,33 @@ internal static class Program
         {
             // I believe these offsets are due to drop shadows rendered by the WM?
                 
-            //      Left = set:4871 / actual:4881 (Actual window is +10 of set)
-            //      Top = set:1816 / actual 1880 (Actual pos is +64 of set)
+            // DAVID-DESKTOP (100% scaling):
+            //      Left = set:4871 / actual:4881 (Actual window is -10 of set)
+            //      Top = set:1816 / actual 1880 (Actual pos is -64 of set)
 
-            var correctedWindowTop = matchingWindowPosition.Top - 64;
+            // DAVID-LAPTOP (150% scaling):
+            //      Left = set:278 / actual:298 (Actual window is -20 of set)
+            //      Top = set:804 / actual 932 (Actual pos is -128 of set)
+
+            var offsetLeft = 0;
+            var offsetTop = 0;
+            
+            if (Environment.MachineName == "DAVID-DESKTOP")
+            {
+                offsetLeft = -10;
+                offsetTop = -64;
+            }
+            
+            if (Environment.MachineName == "DAVID-LAPTOP")
+            {
+                offsetLeft = -20;
+                offsetTop = -128;
+            }
+            
+            var correctedWindowTop = matchingWindowPosition.Top + offsetTop;
             var preferredTop = preferredWindowPositions[i].Top;
                 
-            var correctedWindowLeft = matchingWindowPosition.Left - 10;
+            var correctedWindowLeft = matchingWindowPosition.Left + offsetLeft;
             var preferredLeft = preferredWindowPositions[i].Left;
                 
             var correctedWindowWidth = matchingWindowPosition.Width;

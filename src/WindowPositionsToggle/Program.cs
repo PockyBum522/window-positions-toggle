@@ -196,8 +196,8 @@ internal static class Program
              
             if (windowPreference.LeftTopScalingMultiple != 1.0m)
             {
-                correctedWindowLeft = (long)(correctedWindowLeft * windowPreference.LeftTopScalingMultiple);
-                correctedWindowTop = (long)(correctedWindowTop * windowPreference.LeftTopScalingMultiple);
+                correctedWindowLeft = (long)(correctedWindowLeft / windowPreference.LeftTopScalingMultiple);
+                correctedWindowTop = (long)(correctedWindowTop / windowPreference.LeftTopScalingMultiple);
             }
             
             var correctedWindowWidth = matchingWindowPosition.Width;

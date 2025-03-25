@@ -19,6 +19,8 @@ If the app is already at one of the PreferredPositions, it will always move the 
 ## Calculating offsets:
 Take a look in getSavedIndexOf() in Program.cs. Offsets can be calculated by setting a program using the app and JSON file, then running wmctrl -lG and seeing what the reported Left and Top are vs. what values you set with the JSON config. I already have per-machine handling in that file for my laptop vs my desktop since both use different dpi scaling. Modify with your offsets.
 
+Some windows, like gnome-terminal, do not have offsets, but will only allow certain widths/heights to be set.
+
 I may just move everything to be per-window class offsets in the JSON
 
 NOTE: When dpi scaling, things go sideways. Read the JSON examples carefully.

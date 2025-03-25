@@ -19,6 +19,10 @@ If the app is already at one of the PreferredPositions, it will always move the 
 ## Calculating offsets:
 Take a look in getSavedIndexOf() in Program.cs. Offsets can be calculated by setting a program using the app and JSON file, then running wmctrl -lG and seeing what the reported Left and Top are vs. what values you set with the JSON config. I already have per-machine handling in that file for my laptop vs my desktop since both use different dpi scaling. Modify with your offsets.
 
+I may just move everything to be per-window class offsets in the JSON
+
+NOTE: When dpi scaling, things go sideways. Read the JSON examples carefully.
+
 # Installation
 
 Install below dependencies. Update _userPreferencesPath at the top of Program.cs, which is where the configuration JSON dotfile will be stored.
@@ -49,6 +53,10 @@ As shown, Nemo will only ever snap to one position, with the top left corner of 
 
 xed will snap to two positions. If it's not at either of them, it will first snap to the top left of the top left monitor, then if the program is run again while it is at that position and size, it will then snap to 300, 400 at a size of 500x400 for the window. Repeatedly running the program after that will just keep snapping the window between those two positions/sizes.
 
+Github desktop when set to go to 300, 300 actually reports that it is at 300, 244. This is why there's "ExtraTopOffset": 56. That adds an additional offset correction of +56 to whatever is reported. These can also be negative.
+
+Jetbrains Rider has "LeftTopScalingMultiple": 2.0 because if it is set to Left:100, Top:100, wmctrl -lG will report it is at 200, 200. If it is set to Left:200, Top:300, wmctrl -lG will report it is at 400, 600, etc...
+
 ```
 [
   {
@@ -76,6 +84,43 @@ xed will snap to two positions. If it's not at either of them, it will first sna
         "Top": 400,
         "Width": 500,
         "Height": 400
+      }
+    ]
+  },
+  {
+    "ClassPattern": "github desktop.GitHub Desktop",
+    "ExtraLeftOffset": -0,
+    "ExtraTopOffset": 56,
+    "PreferredPositions": [
+      {
+        "Left": 300,
+        "Top": 300,
+        "Width": 2560,
+        "Height": 1800
+      },
+      {
+        "Left": 400,
+        "Top": 400,
+        "Width": 2560,
+        "Height": 1800
+      }
+    ]
+  },
+  {
+    "ClassPattern": "jetbrains-rider.jetbrains-rider",
+    "LeftTopScalingMultiple": 2.0,
+    "PreferredPositions": [
+      {
+        "Left": 890,
+        "Top": 0,
+        "Width": 4230,
+        "Height": 2798
+      },
+      {
+        "Left": 5120,
+        "Top": 0,
+        "Width": 2560,
+        "Height": 2800
       }
     ]
   }

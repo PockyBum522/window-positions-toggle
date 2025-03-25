@@ -1,6 +1,6 @@
 namespace WindowPositionsToggle.WindowHelpers;
 
-public class ProcessIdHelpers
+public static class ProcessIdHelpers
 {
     public static string LongIdToHexLeadingZero(long processId)
     {

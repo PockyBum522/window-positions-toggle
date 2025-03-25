@@ -90,19 +90,14 @@ internal static class Program
              moveNotFoundWindowsToDefaultPosition(windowToMove);
         }
     }
-
-    private static void moveNotFoundWindowsToDefaultPosition(WindowInformation windowToMatchPidOf)
-    {
-        var nextPosition = new WindowPosition(5000, 2000, 1400, 800);
-        
-        moveWindowByPid(windowToMatchPidOf.Id, nextPosition);
-    }
     
     private static void incrementMatchingWindowToNextPosition(WindowInformation windowToMatchPidOf, List<SavedWindowPreferences> userSavedPreferences)
     {
-        var savedPositions = getSavedMatchingPositions(windowToMatchPidOf.Class, userSavedPreferences);
+        var savedWindow = getSpecificWindowPreferences(windowToMatchPidOf.Class, userSavedPreferences);
 
-        var currentWindowIndex = getSavedIndexOf(windowToMatchPidOf.Position, userSavedPreferences); //getSavedIndexesOf(existingMatchingWindowPositions, savedPositions);
+        var savedPositions = savedWindow.PreferredPositions;
+
+        var currentWindowIndex = getSavedIndexOf(windowToMatchPidOf.Position, savedWindow); //getSavedIndexesOf(existingMatchingWindowPositions, savedPositions);
 
         var nextPosition = getPositionAtNextIndexAfter(currentWindowIndex, savedPositions);
         
@@ -118,6 +113,26 @@ internal static class Program
         // Move windows to next position
         nextPosition = getPositionAtNextIndexAfter(currentWindowIndex, savedPositions);
 
+        moveWindowByPid(windowToMatchPidOf.Id, nextPosition);
+    }
+
+    private static SavedWindowPreferences getSpecificWindowPreferences(string windowClassPattern, List<SavedWindowPreferences> userSavedPreferences)
+    {
+        foreach (var savedPreference in userSavedPreferences)
+        {
+            if (savedPreference.ClassPattern.Contains(windowClassPattern, StringComparison.InvariantCultureIgnoreCase))
+            {
+                return savedPreference;
+            }
+        }
+        
+        throw new Exception("No saved window preference found");
+    }
+
+    private static void moveNotFoundWindowsToDefaultPosition(WindowInformation windowToMatchPidOf)
+    {
+        var nextPosition = new WindowPosition(5000, 2000, 1400, 800);
+        
         moveWindowByPid(windowToMatchPidOf.Id, nextPosition);
     }
     
@@ -141,21 +156,9 @@ internal static class Program
         return preferredWindowPositions[priorIndex + 1];
     }
 
-    private static List<WindowPosition> getSavedMatchingPositions(string windowClass, List<SavedWindowPreferences> userSavedPreferences)
+    private static int getSavedIndexOf(WindowPosition matchingWindowPosition, SavedWindowPreferences windowPreference)
     {
-        foreach (var savedWindowPreference in userSavedPreferences)
-        {
-            if (!savedWindowPreference.ClassPattern.Contains(windowClass)) continue;
-
-            return savedWindowPreference.PreferredPositions;
-        }
-        
-        throw new Exception("No such window exists");
-    }
-
-    private static int getSavedIndexOf(WindowPosition matchingWindowPosition, List<SavedWindowPreferences> userSavedPreferences)
-    {
-        for (var i = preferredWindowPositions.Count - 1; i >= 0; i--)
+        for (var i = windowPreference.PreferredPositions.Count - 1; i >= 0; i--)
         {
             // I believe these offsets are due to drop shadows rendered by the WM?
                 
@@ -175,24 +178,33 @@ internal static class Program
                 offsetLeft = -10;
                 offsetTop = -64;
             }
-            
-            if (Environment.MachineName == "DAVID-LAPTOP")
+
+            if (windowPreference.LeftTopScalingMultiple == 1.0m)
             {
-                offsetLeft = -20;
-                offsetTop = -128;
+                if (Environment.MachineName == "DAVID-LAPTOP")
+                {
+                    offsetLeft = -20;
+                    offsetTop = -128;
+                }
             }
             
             var correctedWindowTop = matchingWindowPosition.Top + offsetTop;
-            var preferredTop = preferredWindowPositions[i].Top;
+            var preferredTop = windowPreference.PreferredPositions[i].Top;
                 
             var correctedWindowLeft = matchingWindowPosition.Left + offsetLeft;
-            var preferredLeft = preferredWindowPositions[i].Left;
-                
+            var preferredLeft = windowPreference.PreferredPositions[i].Left;
+             
+            if (windowPreference.LeftTopScalingMultiple != 1.0m)
+            {
+                correctedWindowLeft = (long)(correctedWindowLeft * windowPreference.LeftTopScalingMultiple);
+                correctedWindowTop = (long)(correctedWindowTop * windowPreference.LeftTopScalingMultiple);
+            }
+            
             var correctedWindowWidth = matchingWindowPosition.Width;
-            var preferredWidth = preferredWindowPositions[i].Width;
+            var preferredWidth = windowPreference.PreferredPositions[i].Width;
                 
             var correctedWindowHeight =  matchingWindowPosition.Height;
-            var preferredHeight = preferredWindowPositions[i].Height;
+            var preferredHeight = windowPreference.PreferredPositions[i].Height;
                 
             if (correctedWindowTop == preferredTop &&
                 correctedWindowLeft == preferredLeft &&

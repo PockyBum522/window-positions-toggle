@@ -18,11 +18,23 @@ internal static class Program
     
     private static List<string> _classIgnoreList = new(){ "nemo-desktop.Nemo-desktop" };
     
-    internal static void Main(string[] args)
+    internal static async Task Main(string[] args)
     {
-        var activeWindow = _wmCtrlParser.GetActiveWindowInformation();
+        foreach (var arg in args)
+            Console.WriteLine($"Arg: {arg}");
         
-        printWindowInfo(activeWindow);
+        var activeWindow = _wmCtrlParser.GetActiveWindowInformation();
+
+        if (args.Contains("-v", StringComparer.InvariantCultureIgnoreCase))
+        {
+            await Task.Delay(3000);
+            
+            activeWindow = _wmCtrlParser.GetActiveWindowInformation();
+            
+            printWindowInfo(activeWindow);
+            
+            return;
+        }
         
         moveWindowToAppropriateLocation(activeWindow);
     }

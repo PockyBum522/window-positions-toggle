@@ -7,10 +7,10 @@ namespace WindowPositionsToggle;
 
 internal static class Program
 {
-    private static readonly string _userDesktopPath = "/media/secondary/repos/linux-files/configuration/dotfiles/window-positions-toggle";
+    private static readonly string _userPreferencesPath = "/media/secondary/repos/linux-files/configuration/dotfiles/window-positions-toggle";
     private static readonly string _userPreferencesFileName = $".{Environment.MachineName}-window-preferred-locations.json";
     
-    public static readonly string UserPreferencesFullPath = Path.Combine(_userDesktopPath, _userPreferencesFileName);
+    public static readonly string UserPreferencesFullPath = Path.Combine(_userPreferencesPath, _userPreferencesFileName);
     
     private static readonly ILogger _logger = InitializeLogger();
     private static readonly ShellCommandWrapper _shellCommandWrapper = new(_logger);

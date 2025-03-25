@@ -8,6 +8,8 @@ Using wmctrl to snap my windows into the positions I want automatically, dependi
 
 2. Set up a configuration JSON file as directed below, you can run the app with "-v" and it will wait 3 seconds then tell you what the class name of the active window is, and also give you Top, Left, Width, Height attributes for the active window so you can easily add them to your JSON config file.
 
+Note: I may need to add offsets for these. They may be off by the width of the drop shadows that cinnamon is rendering. They will be close to what you want, anyways.
+
 3. Once you have what class to match on, and one or more PreferredPositions in your JSON config file, then focus a window with a class in your json file, and run the application. (I suggest setting up a hotkey somehow or you're only ever going to have it be your terminal window you're running the app from that's the focused window, obviously.)
 
 When run, the app will look for a class match in the JSON file, once it finds one, it will place the matched window that is focused when the app is run at the first PreferredPosition for that class. If there is more than one PreferredPosition for that class in the JSON file, it will loop through all of the PreferredPositions, changing the window location and size to match each PreferredPosition.

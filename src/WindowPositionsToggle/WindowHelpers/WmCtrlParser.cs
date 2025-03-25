@@ -31,10 +31,17 @@ public class WmCtrlParser(ILogger logger)
         var returnMatchedWindow = new WindowInformation(converted);
 
         addWindowClassInformation(returnMatchedWindow);
+        
+        addWindowCurrentLocation(returnMatchedWindow);
 
         addWindowPreferredLocations(returnMatchedWindow);
         
         return returnMatchedWindow;
+    }
+
+    private void addWindowCurrentLocation(WindowInformation returnMatchedWindow)
+    {
+        returnMatchedWindow.Position = getWindowPositionMatchingPid(returnMatchedWindow.Id);
     }
 
     public List<WindowPosition> GetExistingWindowPositionsMatchingClass(string windowClassNeedle)

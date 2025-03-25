@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Text.Json.Nodes;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Serilog;
 using WindowPositionsToggle.Models;
 using WindowPositionsToggle.WindowHelpers;
@@ -9,8 +7,8 @@ namespace WindowPositionsToggle;
 
 internal static class Program
 {
-    private static readonly string _userDesktopPath = "/home/david/Desktop";
-    private static readonly string _userPreferencesFileName = "saved-window-prefs-dummy.json";
+    private static readonly string _userDesktopPath = "/media/secondary/repos/linux-files/configuration/dotfiles/window-positions-toggle";
+    private static readonly string _userPreferencesFileName = $".{Environment.MachineName}-window-preferred-locations.json";
     
     public static readonly string UserPreferencesFullPath = Path.Combine(_userDesktopPath, _userPreferencesFileName);
     
@@ -18,25 +16,52 @@ internal static class Program
     private static readonly ShellCommandWrapper _shellCommandWrapper = new(_logger);
     private static readonly WmCtrlParser _wmCtrlParser = new(_logger);
     
+    private static List<string> _classIgnoreList = new(){ "nemo-desktop.Nemo-desktop" };
     
     internal static void Main(string[] args)
     {
-        moveActiveWindowToAppropriateLocation();
+        var activeWindow = _wmCtrlParser.GetActiveWindowInformation();
+        
+        printWindowInfo(activeWindow);
+        
+        moveWindowToAppropriateLocation(activeWindow);
     }
 
-    private static void moveActiveWindowToAppropriateLocation()
+    private static void printWindowInfo(WindowInformation windowToPrint)
+    {
+        Console.WriteLine($"On computer: {Environment.MachineName}");
+        Console.WriteLine();
+        
+        Console.WriteLine("Active Window Info:");
+        Console.WriteLine();
+        Console.WriteLine($"Class: '{windowToPrint.Class}'");
+        Console.WriteLine();
+        Console.WriteLine("{");
+        Console.WriteLine($"\t\"Left\": {windowToPrint.Position.Left},");
+        Console.WriteLine($"\t\"Top\": {windowToPrint.Position.Top},");
+        Console.WriteLine($"\t\"Width\": {windowToPrint.Position.Width},");
+        Console.WriteLine($"\t\"Height\": {windowToPrint.Position.Height}");
+        Console.WriteLine("}");
+        Console.WriteLine();
+    }
+
+    private static void moveWindowToAppropriateLocation(WindowInformation windowToMove)
     {
         var userSavedPreferences = loadJsonSavedConfiguration(UserPreferencesFullPath);
         
-        var activeWindow = _wmCtrlParser.GetActiveWindowInformation();
-
-        if (windowClassInSaved(activeWindow))
+        if (_classIgnoreList.Contains(windowToMove.Class, StringComparer.InvariantCultureIgnoreCase))
         {
-            incrementMatchingClassWindowsToNextPosition(activeWindow, userSavedPreferences);
+            Console.WriteLine($"{windowToMove.Class} was in blacklist, so not going to do anything");
+            return;
+        }
+            
+        if (windowClassInSaved(windowToMove))
+        {
+            incrementMatchingClassWindowsToNextPosition(windowToMove, userSavedPreferences);
         }
         else
         {
-             moveNotFoundWindowsToDefaultPosition(activeWindow);
+             moveNotFoundWindowsToDefaultPosition(windowToMove);
         }
     }
 

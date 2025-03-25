@@ -11,36 +11,13 @@ internal static class Program
     private static readonly string _userDesktopPath = "/home/david/Desktop";
     
     private static readonly ILogger _logger = InitializeLogger();
-    private static readonly XDoToolWrapper _xDoToolWrapper = new(_logger);
     private static readonly WmCtrlWrapper _wmCtrlWrapper = new(_logger);
-    private static readonly WindowInformationParser _windowInformationParser = new(_logger, _xDoToolWrapper, _wmCtrlWrapper);
     
     internal static void Main(string[] args)
     {
-        saveFocusedWindowState();
         
-        // saveDummyWindowState();
     }
     
-    // Make a position all windows mode
-    
-    // Make windows snap into primary location if not there, secondary location if at primary already
-    
-    // Make an identify window mode
-
-    private static void saveFocusedWindowState()
-    {
-        var focusedWindow = _windowInformationParser.GetFocusedWindow();
-
-        var windowInformationFilePath = Path.Join(_userDesktopPath, $"saved-window-information_id-{focusedWindow.Id}.json");
-        
-        var windowJson = JsonConvert.SerializeObject(focusedWindow, Formatting.Indented);
-        
-        File.WriteAllText(windowInformationFilePath, windowJson);
-        
-        _logger.Debug("Focused window info: {@WindowInfo}", focusedWindow);
-    }
-
     private static void saveDummyWindowState()
     {
         var listToSave = new List<SavedWindowPreferences>();
@@ -80,11 +57,6 @@ internal static class Program
         File.WriteAllText(windowInformationFilePath, windowJson);
     }
 
-    private static void SnapFocusedWindow()
-    {
-        var focusedWindow = _windowInformationParser.GetFocusedWindow();
-    }
-    
     private static ILogger InitializeLogger()
     {
         var loggerApplication = new LoggerConfiguration()

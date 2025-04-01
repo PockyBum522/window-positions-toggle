@@ -58,9 +58,9 @@ public class App : Application
             
             printWindowInfo(activeWindow);
             
-            return;
+            Environment.Exit(0);
         }
-
+        
         if (fullArguments.Contains("-gui-select-win", StringComparer.InvariantCultureIgnoreCase))
         {
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
@@ -75,13 +75,15 @@ public class App : Application
                 singleViewPlatform.MainView = scope.Resolve<MainView>();
             }
 
+            base.OnFrameworkInitializationCompleted();
+            
             return;
         }
         
         // If no args just do window toggle
         moveWindowToAppropriateLocation(activeWindow);
-
-        base.OnFrameworkInitializationCompleted();
+        
+        Environment.Exit(0);
     }
     
     

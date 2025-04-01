@@ -1,0 +1,98 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:viewModels="clr-namespace:WindowPositionsToggle.ViewModels"
+        mc:Ignorable="d" 
+        x:Class="WindowPositionsToggle.Views.MainView"
+        x:DataType="viewModels:MainViewModel"
+        Background="Black" >
+        
+        <Design.DataContext>
+            <!-- This only sets the DataContext for the previewer in an IDE, to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+            <viewModels:MainViewModel />
+        </Design.DataContext>
+        
+        <!-- <Interaction.Behaviors> -->
+        <!--     <EventTriggerBehavior EventName="Loaded" > -->
+        <!--         <InvokeCommandAction Command="{Binding whenViewLoadedCommand}" CommandParameter="{Binding #ScottPlot01}" /> -->
+        <!--     </EventTriggerBehavior> -->
+        <!-- </Interaction.Behaviors> -->
+        
+        <UserControl.Styles>
+        
+            <Style Selector="TextBlock">
+                <Setter Property="FontSize" Value="10" />
+                <Setter Property="Foreground" Value="#DDDDDD"/>
+            </Style>
+        
+            <!-- Control defaults -->
+            <Style Selector=":is(Button)">
+                <Setter Property="FontSize" Value="14" />
+                <Setter Property="HorizontalContentAlignment" Value="Center" />
+                <Setter Property="VerticalContentAlignment" Value="Center" />
+            </Style>
+        </UserControl.Styles>
+        
+        <Grid>
+            <!-- Main controls -->
+            <Grid Margin="10" RowDefinitions="50,100,50">
+
+                <!-- Top section -->
+                <StackPanel Orientation="Vertical">
+                    <TextBlock Text="Please click the select window button," />
+                    <TextBlock Text="then switch to the window you want to control," />
+                    <TextBlock Text="and wait three seconds." />
+                </StackPanel>
+                
+                <!-- Middle section -->
+                <UniformGrid Grid.Row="1" Rows="4" Columns="2" Margin="5">
+                    
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Left: " FontWeight="Bold" />
+                        <TextBlock Text="{Binding LeftValue, FallbackValue=ERROR_F, TargetNullValue=ERROR_N}" />
+                    </StackPanel>
+                    
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Top: " FontWeight="Bold" />
+                        <TextBlock Text="{Binding TopValue, FallbackValue=ERROR_F, TargetNullValue=ERROR_N}" />
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Width: " FontWeight="Bold" />
+                        <TextBlock Text="{Binding WidthValue, FallbackValue=ERROR_F, TargetNullValue=ERROR_N}" />
+                    </StackPanel>
+                    
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Height: " FontWeight="Bold" />
+                        <TextBlock Text="{Binding HeightValue, FallbackValue=ERROR_F, TargetNullValue=ERROR_N}" />
+                    </StackPanel>
+                    
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Top Offset: " FontWeight="Bold" />
+                        <TextBlock Text="{Binding TopOffsetValue, FallbackValue=ERROR_F, TargetNullValue=ERROR_N}" />
+                    </StackPanel>
+                    
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Left Offset: " FontWeight="Bold" />
+                        <TextBlock Text="{Binding LeftOffsetValue, FallbackValue=ERROR_F, TargetNullValue=ERROR_N}" />
+                    </StackPanel>
+                    
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Scaling: " FontWeight="Bold" />
+                        <TextBlock Text="{Binding ScalingValue, FallbackValue=ERROR_F, TargetNullValue=ERROR_N}" />
+                    </StackPanel>
+                    
+                </UniformGrid>
+
+                <!-- Bottom section -->
+                <StackPanel Grid.Row="2" Orientation="Horizontal">
+                    <Button Content="Select Window" Command="{Binding SelectWindowCommand}" 
+                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                            Margin="0,0,10,0"/>
+                
+                    <Button Content="Add to Config" Command="{Binding SelectWindowCommand}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </StackPanel>
+            </Grid>
+        </Grid>
+</UserControl>

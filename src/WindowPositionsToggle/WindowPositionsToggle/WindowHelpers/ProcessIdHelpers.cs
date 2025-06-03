@@ -9,6 +9,7 @@ public static class ProcessIdHelpers
         toHex += processId.ToString("x8");
         
         return toHex;
+
     }
     
     public static long HexIdToLong(string hexProcessId)

@@ -5,7 +5,7 @@ using WindowPositionsToggle.Models;
 
 namespace WindowPositionsToggle.WindowHelpers;
 
-public class WmCtrlParser(ILogger logger)
+public class LinuxWindowController(ILogger logger) : IWindowLowLevelController
 {
     private readonly ShellCommandWrapper _shellCommandWrapper = new(logger);
 

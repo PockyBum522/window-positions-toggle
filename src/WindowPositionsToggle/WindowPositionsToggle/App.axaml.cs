@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Runtime.InteropServices;
 using Autofac;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
@@ -12,14 +13,14 @@ namespace WindowPositionsToggle;
 
 public class App : Application
 {
-    private static readonly string _userPreferencesPath = "/media/secondary/repos/linux-files/configuration/dotfiles/window-positions-toggle";
     private static readonly string _userPreferencesFileName = $".{Environment.MachineName}-window-preferred-locations.json";
     
-    public static readonly string UserPreferencesFullPath = Path.Combine(_userPreferencesPath, _userPreferencesFileName);
+    public static readonly string UserPreferencesFullPath = Path.Combine(ApplicationPaths.UserSettingsDirectory, _userPreferencesFileName);
     
-    private static readonly ILogger _logger = InitializeLogger();
+    private static ILogger? _logger;
+    private static IWindowLowLevelController? _windowController;
+    
     private static readonly ShellCommandWrapper _shellCommandWrapper = new(_logger);
-    private static readonly WmCtrlParser _wmCtrlParser = new(_logger);
     
     private static List<string> _classIgnoreList = new(){ "nemo-desktop.Nemo-desktop" };
     
@@ -36,25 +37,25 @@ public class App : Application
 
         await using var scope = dependencyContainer.BeginLifetimeScope();
         
-        var loggerApplication = scope.Resolve<ILogger>();
+        _logger = scope.Resolve<ILogger>();
         
-        loggerApplication.Information("Application started. About to fire up MainWindow if IClassicDesktopStyleApplicationLifetime or MainView if ISingleViewApplicationLifetime");
+        _logger.Information("Application started. About to fire up MainWindow if IClassicDesktopStyleApplicationLifetime or MainView if ISingleViewApplicationLifetime");
         
         foreach (var arg in fullArguments)
             Console.WriteLine($"Arg: {arg}");
-        
-        
+
         if (!File.Exists(UserPreferencesFullPath))
             saveDummyWindowState();
         
+        _windowController = scope.Resolve<IWindowLowLevelController>();
         
-        var activeWindow = _wmCtrlParser.GetActiveWindowInformation();
+        var activeWindow = _windowController.GetActiveWindowInformation();
 
         if (fullArguments.Contains("-cli-select-win", StringComparer.InvariantCultureIgnoreCase))
         {
             await Task.Delay(3000);
             
-            activeWindow = _wmCtrlParser.GetActiveWindowInformation();
+            activeWindow = _windowController.GetActiveWindowInformation();
             
             printWindowInfo(activeWindow);
             
@@ -85,8 +86,7 @@ public class App : Application
         
         Environment.Exit(0);
     }
-    
-    
+
     private static void printWindowInfo(WindowInformation windowToPrint)
     {
         Console.WriteLine($"On computer: {Environment.MachineName}");
@@ -286,8 +286,6 @@ public class App : Application
         return returnWindowPreferences ?? [];
     }
     
-    
-    // ReSharper disable once UnusedMember.Local because it is useful if someone wants to see how to save out window preferences JSON file
     private static void saveDummyWindowState()
     {
         var listToSave = new List<SavedWindowPreferences>();
@@ -327,20 +325,5 @@ public class App : Application
         var windowJson = JsonConvert.SerializeObject(listToSave, Formatting.Indented);
         
         File.WriteAllText(windowInformationFilePath, windowJson);
-    }
-
-    private static ILogger InitializeLogger()
-    {
-        var loggerApplication = new LoggerConfiguration()
-            .Enrich.WithProperty(AppInfo.AppName + "Application", AppInfo.AppName + "SerilogContext")
-            // .MinimumLevel.Information()
-            .MinimumLevel.Debug()
-            .WriteTo.File(
-                Path.Join(AppInfo.Paths.ApplicationLoggingDirectory, "log_.log"), rollingInterval: RollingInterval.Day)
-            .WriteTo.Debug()
-            .WriteTo.Console()
-            .CreateLogger();
-        
-        return loggerApplication;
     }
 }

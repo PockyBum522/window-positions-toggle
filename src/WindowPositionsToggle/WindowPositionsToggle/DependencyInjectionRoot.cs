@@ -1,6 +1,8 @@
+using System.Runtime.InteropServices;
 using Autofac;
 using WindowPositionsToggle.ViewModels;
 using WindowPositionsToggle.Views;
+using WindowPositionsToggle.WindowHelpers;
 
 namespace WindowPositionsToggle;
 
@@ -8,9 +10,9 @@ namespace WindowPositionsToggle;
 public class DependencyInjectionRoot
 {
     public static readonly ILogger LoggerApplication = new LoggerConfiguration()
-        .Enrich.WithProperty("RotovapApplication", "SerilogRotovapContext")
-        .MinimumLevel.Information()
-        //.MinimumLevel.Debug()
+        .Enrich.WithProperty("WindowPositionsToggle", "SerilogWindowPositionsToggleContext")
+        //.MinimumLevel.Information()
+        .MinimumLevel.Debug()
         .WriteTo.File(
             Path.Join(ApplicationPaths.ApplicationLoggingDirectory, "log_.log"), rollingInterval: RollingInterval.Day)
         .WriteTo.Debug()
@@ -35,10 +37,16 @@ public class DependencyInjectionRoot
             });
         };
 
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            DependencyContainerBuilder.RegisterType<LinuxWindowController>().As<IWindowLowLevelController>();
+        
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            DependencyContainerBuilder.RegisterType<MicrosoftWindowController>().As<IWindowLowLevelController>();
+        
         // Setup UI (Views and ViewModels) 
         DependencyContainerBuilder.RegisterType<MainViewModel>().AsSelf().SingleInstance();
         DependencyContainerBuilder.RegisterType<MainView>().AsSelf().SingleInstance();
-
+        
         var mainWindow = new MainWindow(false);
         DependencyContainerBuilder.RegisterInstance(mainWindow).AsSelf().SingleInstance();
         

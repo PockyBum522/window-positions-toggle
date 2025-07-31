@@ -1,8 +1,5 @@
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using Newtonsoft.Json;
-using Serilog;
 using WindowPositionsToggle.Models;
 
 namespace WindowPositionsToggle.WindowHelpers;

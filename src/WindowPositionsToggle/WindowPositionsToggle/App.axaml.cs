@@ -1,10 +1,12 @@
+using System.Diagnostics;
 using System.Linq;
-using System.Runtime.InteropServices;
 using Autofac;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Newtonsoft.Json;
+using SharpHook;
+using SharpHook.Data;
 using WindowPositionsToggle.Models;
 using WindowPositionsToggle.Views;
 using WindowPositionsToggle.WindowHelpers;
@@ -24,6 +26,9 @@ public class App : Application
     
     private static List<string> _classIgnoreList = new(){ "nemo-desktop.Nemo-desktop" };
     
+    private static bool _isAltKeyPressedDown;
+    private static Stopwatch _hotkeyEventsRunTimer = new();
+    
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
@@ -31,11 +36,18 @@ public class App : Application
 
     public override async void OnFrameworkInitializationCompleted()
     {
+        var benchmarkTimer = new Stopwatch();
+        benchmarkTimer.Start();
+
+        Console.WriteLine($"[TIMER] Start: {benchmarkTimer.Elapsed.Milliseconds}ms");
+        
         var fullArguments = Environment.GetCommandLineArgs();
   
         var dependencyContainer = DependencyInjectionRoot.GetBuiltContainer();
-
+        Console.WriteLine($"[TIMER] After DI build: {benchmarkTimer.Elapsed.Milliseconds}ms");
+        
         await using var scope = dependencyContainer.BeginLifetimeScope();
+        Console.WriteLine($"[TIMER] After DI init: {benchmarkTimer.Elapsed.Milliseconds}ms");
         
         _logger = scope.Resolve<ILogger>();
         _shellCommandWrapper = scope.Resolve<ShellCommandWrapper>();
@@ -45,6 +57,8 @@ public class App : Application
         {
             throw new NullReferenceException($"_logger or _shellCommandWrapper was null in {nameof(OnFrameworkInitializationCompleted)}");
         }
+        
+        Console.WriteLine($"[TIMER] After DI resolves: {benchmarkTimer.Elapsed.Milliseconds}ms");
         
         _logger.Information("Application started. About to fire up MainWindow if IClassicDesktopStyleApplicationLifetime or MainView if ISingleViewApplicationLifetime");
         
@@ -60,6 +74,8 @@ public class App : Application
         
         var activeWindow = _windowController.GetActiveWindowInformation();
 
+        Console.WriteLine($"[TIMER] After gotten active window info: {benchmarkTimer.Elapsed.Milliseconds}ms");
+        
         if (fullArguments.Contains("-cli-select-win", StringComparer.InvariantCultureIgnoreCase))
         {
             await Task.Delay(3000);
@@ -90,10 +106,64 @@ public class App : Application
             return;
         }
         
-        // If no args just do window toggle
-        moveWindowToAppropriateLocation(activeWindow);
+        Console.WriteLine($"[TIMER] About to move window: {benchmarkTimer.Elapsed.Milliseconds}ms");
         
-        Environment.Exit(0);
+        // // If no args just do window toggle
+        // moveWindowToAppropriateLocation(activeWindow);
+        //
+        // Console.WriteLine($"[TIMER] Moved window: {benchmarkTimer.Elapsed.Milliseconds}ms");
+        //
+        // Environment.Exit(0);
+
+        Console.WriteLine("Starting hotkey hook listener");        
+        var hook = new TaskPoolGlobalHook();
+        
+        hook.KeyPressed += HookOnKeyPressed;
+        hook.KeyReleased += HookOnKeyReleased;
+        
+        await hook.RunAsync();
+        
+        // Do not remove this, since we don't want to have to waste CPU checking in HookOnKeyPressed,
+        // so I'd like to know if something's very wrong before then. (I.E. Here.) 
+        if (_windowController is null)
+            throw new NullReferenceException("_windowController was null");
+        
+        Console.WriteLine("Hook started, waiting for Alt + R");
+        Console.WriteLine("");
+        Console.WriteLine("Press enter to exit...");
+        Console.ReadLine();
+    }
+
+    private void HookOnKeyReleased(object? sender, KeyboardHookEventArgs e)
+    {
+        if (e.Data.KeyCode is KeyCode.VcLeftAlt or KeyCode.VcRightAlt)
+        {
+            _isAltKeyPressedDown = false;
+        }
+    }
+
+    private void HookOnKeyPressed(object? sender, KeyboardHookEventArgs e)
+    {
+        if (e.Data.KeyCode is KeyCode.VcLeftAlt or KeyCode.VcRightAlt)
+        {
+            _isAltKeyPressedDown = true;
+        }
+        
+        if (e.Data.KeyCode == KeyCode.VcR)
+        {
+            if (_isAltKeyPressedDown)
+            {
+                // In here should be Alt + R
+                
+                _hotkeyEventsRunTimer.Restart();
+                
+                // This is checked for null in OnFrameworkInitializationCompleted()
+                var activeWindow = _windowController!.GetActiveWindowInformation();
+                moveWindowToAppropriateLocation(activeWindow);
+
+                Console.WriteLine($"[TIMER] Took: {_hotkeyEventsRunTimer.Elapsed.Milliseconds}ms to run all window work");
+            }
+        }
     }
 
     private static void printWindowInfo(WindowInformation windowToPrint)

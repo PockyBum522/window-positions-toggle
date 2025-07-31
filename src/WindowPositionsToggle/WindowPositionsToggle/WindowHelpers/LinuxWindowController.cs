@@ -1,14 +1,11 @@
 using System.Linq;
 using Newtonsoft.Json;
-using Serilog;
 using WindowPositionsToggle.Models;
 
 namespace WindowPositionsToggle.WindowHelpers;
 
-public class LinuxWindowController(ILogger logger) : IWindowLowLevelController
+public class LinuxWindowController(ShellCommandWrapper _shellCommandWrapper) : IWindowLowLevelController
 {
-    private readonly ShellCommandWrapper _shellCommandWrapper = new(logger);
-
     public WindowInformation GetActiveWindowInformation()
     {
         // Get active window class, current location/size

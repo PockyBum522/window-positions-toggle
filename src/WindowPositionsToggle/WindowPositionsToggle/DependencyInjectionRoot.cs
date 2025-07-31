@@ -12,7 +12,7 @@ public class DependencyInjectionRoot
     public static readonly ILogger LoggerApplication = new LoggerConfiguration()
         .Enrich.WithProperty("WindowPositionsToggle", "SerilogWindowPositionsToggleContext")
         //.MinimumLevel.Information()
-        .MinimumLevel.Debug()
+        .MinimumLevel.Information()
         .WriteTo.File(
             Path.Join(ApplicationPaths.ApplicationLoggingDirectory, "log_.log"), rollingInterval: RollingInterval.Day)
         .WriteTo.Debug()

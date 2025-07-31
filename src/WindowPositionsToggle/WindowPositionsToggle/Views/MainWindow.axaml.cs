@@ -1,5 +1,3 @@
-using Avalonia.Platform;
-
 namespace WindowPositionsToggle.Views;
 
 public partial class MainWindow : Window

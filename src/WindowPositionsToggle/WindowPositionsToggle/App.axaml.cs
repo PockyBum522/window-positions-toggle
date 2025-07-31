@@ -194,6 +194,12 @@ public class App : Application
     {
         var hexPid = ProcessIdHelpers.LongIdToHexLeadingZero(windowPid);
         
+        if (_logger is null ||
+            _shellCommandWrapper is null)
+        {
+            throw new NullReferenceException($"_logger or _shellCommandWrapper was null in {nameof(OnFrameworkInitializationCompleted)}");
+        }
+        
         _shellCommandWrapper.RunInShell(
             "wmctrl", $"-ir {hexPid} -e 0,{newPosition.Left},{newPosition.Top},{newPosition.Width},{newPosition.Height}");
     }

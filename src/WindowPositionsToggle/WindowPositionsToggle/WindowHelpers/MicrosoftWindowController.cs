@@ -7,7 +7,7 @@ using WindowPositionsToggle.Models;
 
 namespace WindowPositionsToggle.WindowHelpers;
 
-public class MicrosoftWindowController(ILogger logger) : IWindowLowLevelController
+public class MicrosoftWindowController() : IWindowLowLevelController
 {
     public WindowInformation GetActiveWindowInformation()
     {

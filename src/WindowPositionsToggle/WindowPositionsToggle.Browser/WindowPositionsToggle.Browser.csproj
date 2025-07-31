@@ -5,6 +5,8 @@
     <RuntimeIdentifier>browser-wasm</RuntimeIdentifier>
     <WasmMainJSPath>wwwroot\main.js</WasmMainJSPath>
     <WasmRuntimeAssetsLocation>./_framework</WasmRuntimeAssetsLocation>
+    <Configurations>Debug;Release</Configurations>
+    <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
 
   <ItemGroup>

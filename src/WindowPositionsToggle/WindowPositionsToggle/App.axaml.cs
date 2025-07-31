@@ -56,8 +56,11 @@ public class App : Application
         _logger = scope.Resolve<ILogger>();
         _shellCommandWrapper = scope.Resolve<ShellCommandWrapper>();
 
+        _userSavedPreferences = loadJsonSavedConfiguration(UserPreferencesFullPath);
+        
         if (_logger is null ||
-            _shellCommandWrapper is null)
+            _shellCommandWrapper is null ||
+            _userSavedPreferences is null)
         {
             throw new NullReferenceException($"_logger or _shellCommandWrapper was null in {nameof(OnFrameworkInitializationCompleted)}");
         }
@@ -215,7 +218,7 @@ public class App : Application
             
         if (windowClassInSaved(windowToMove))
         {
-            incrementMatchingWindowToNextPosition(windowToMove, _userSavedPreferences);
+            incrementMatchingWindowToNextPosition(windowToMove, _userSavedPreferences!);
         }
         else
         {

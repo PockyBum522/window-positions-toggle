@@ -7,6 +7,8 @@ If a window is not already at one of the saved size+locations, it will snap to t
 
 Works with cinnamon well. *Should* work with most X11-based WMs.
 
+Note: After building, you'll need to run the app with something like "/usr/sbin/dotnet ./WindowPositionsToggle.Desktop.dll"
+
 
 # Usage
 
@@ -29,29 +31,16 @@ Some windows, like gnome-terminal, do not have offsets, but will only allow cert
 
 I may just move everything to be per-window class offsets in the JSON
 
-NOTE: When dpi scaling, things go sideways. Read the JSON examples carefully.
+NOTE: When dpi scaling, things go sideways. Read the JSON examples carefully. You can use ExtraTopOffset and ExtraLeftOffset to correct for this per-machine.
 
 # Installation
 
-Install below dependencies. Update _userPreferencesPath at the top of Program.cs, which is where the configuration JSON dotfile will be stored.
-
-If you want to set up a hotkey to make this easy, and have xbindkeys, then add this to your .xbindkeysrc:
-
-```
-# Alt + r
-"/usr/sbin/dotnet /your/path/to/bin/WindowPositionsToggle/WindowPositionsToggle.dll"
-    m:0x18 + c:27
-```
+Install below dependencies. Update _userPreferencesPath at the top of Program.cs to point to where you want it, this is where the configuration JSON dotfile will be stored/loaded from.
 
 
 # Prerequisites
 ```
 sudo apt install wmctrl -y
-```
-
-## If you want an easy way to call the script with a hotkey:
-```
-sudo apt install xbindkeys -y
 ```
 
 

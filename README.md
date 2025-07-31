@@ -5,7 +5,7 @@ You can have multiple preset size+locations for each app, so if there are a few 
 
 If a window is not already at one of the saved size+locations, it will snap to the first one. After that, it will snap to the next saved size+location. When it gets to the end of the list of saved size+locations, it cycles and snaps back to the first one. This means you can move a window wherever you want and resize it however you want to work with it temporarily, then have it back exactly where you like instantly just by hitting a hotkey.
 
-Works with cinnamon well. *Should* work with most X11-based WMs.
+Works with cinnamon well. *Should* work with most X11-based WMs. I plan to add support for Windows 11 at some point.
 
 Note: After building, you'll need to run the app with something like "/usr/sbin/dotnet ./WindowPositionsToggle.Desktop.dll"
 

@@ -46,9 +46,9 @@ sudo apt install wmctrl -y
 
 # Example JSON file:
 
-As shown, Nemo will only ever snap to one position, with the top left corner of the window snapping to 600, 100. And the window size will resize to 600x500.
+In the example below, Nemo will only ever snap to one position when the hotkey is pressed, with the top left corner of the window snapping to 600, 100 and its window size will resize to 600x500.
 
-xed will snap to two positions. If it's not at either of them, it will first snap to the top left of the top left monitor, then if the program is run again while it is at that position and size, it will then snap to 300, 400 at a size of 500x400 for the window. Repeatedly running the program after that will just keep snapping the window between those two positions/sizes.
+xed will snap to two positions. When you first hit the hotkey, if it's not at either of those positions, it will first snap to the top left of the top left monitor, then if the hotkey is pressed again while it is at that first position and size, it will then snap to 300, 400 at a size of 500x400 for the window. Repeatedly running the program after that will just keep snapping the window between those two positions/sizes.
 
 Github desktop when set to go to 300, 300 actually reports that it is at 300, 244. This is why there's "ExtraTopOffset": 56. That adds an additional offset correction of +56 to whatever is reported. These can also be negative.
 

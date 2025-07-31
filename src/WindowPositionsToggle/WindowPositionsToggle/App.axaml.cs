@@ -27,8 +27,12 @@ public class App : Application
     private static List<string> _classIgnoreList = new(){ "nemo-desktop.Nemo-desktop" };
     
     private static bool _isAltKeyPressedDown;
-    private static Stopwatch _hotkeyEventsRunTimer = new();
-    
+    private static Stopwatch _hotkeyAltEventsRunTimer = new();
+    private static Stopwatch _hotkeyWindowWorkEventsRunTimer = new();
+
+    private static WindowInformation? _activeWindow;
+    private static List<SavedWindowPreferences>? _userSavedPreferences;
+
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
@@ -139,31 +143,39 @@ public class App : Application
         if (e.Data.KeyCode is KeyCode.VcLeftAlt or KeyCode.VcRightAlt)
         {
             _isAltKeyPressedDown = false;
+            
+            // Reload this for next time
+            _userSavedPreferences = loadJsonSavedConfiguration(UserPreferencesFullPath);
         }
     }
 
     private void HookOnKeyPressed(object? sender, KeyboardHookEventArgs e)
     {
+        _hotkeyAltEventsRunTimer.Restart();
+        
         if (e.Data.KeyCode is KeyCode.VcLeftAlt or KeyCode.VcRightAlt)
         {
             _isAltKeyPressedDown = true;
+            
+            // Handle whatever we can in the alt portion to try and make things faster
+            _userSavedPreferences ??= loadJsonSavedConfiguration(UserPreferencesFullPath);
+            
+            // _windowController is checked for null in OnFrameworkInitializationCompleted()
+            _activeWindow = _windowController!.GetActiveWindowInformation();
+            
+            Console.WriteLine($"[TIMER] Took: {_hotkeyAltEventsRunTimer.Elapsed.Milliseconds}ms to run all preparation for window work on alt press");
         }
-        
-        if (e.Data.KeyCode == KeyCode.VcR)
-        {
-            if (_isAltKeyPressedDown)
-            {
-                // In here should be Alt + R
-                
-                _hotkeyEventsRunTimer.Restart();
-                
-                // This is checked for null in OnFrameworkInitializationCompleted()
-                var activeWindow = _windowController!.GetActiveWindowInformation();
-                moveWindowToAppropriateLocation(activeWindow);
 
-                Console.WriteLine($"[TIMER] Took: {_hotkeyEventsRunTimer.Elapsed.Milliseconds}ms to run all window work");
-            }
-        }
+        if (e.Data.KeyCode != KeyCode.VcR) return;
+        
+        if (!_isAltKeyPressedDown) return;
+        
+        // Beyond here should be Alt + R
+        _hotkeyWindowWorkEventsRunTimer.Restart();
+        
+        moveWindowToAppropriateLocation(_activeWindow!);
+
+        Console.WriteLine($"[TIMER] Took: {_hotkeyWindowWorkEventsRunTimer.Elapsed.Milliseconds}ms to run all window work");
     }
 
     private static void printWindowInfo(WindowInformation windowToPrint)
@@ -189,15 +201,11 @@ public class App : Application
         // We are now going to have to:
         
         //      Deserialize saved preferences
-        
         //      Pass along the SavedWindowPreferences that matches the class of active window
-        
         //      Use that to calculate offset - No offset if it's a 0.5x scaling app
-        
         //      Use that to calculate how to handle reported position - Halve reported position before working with it
         
-        
-        var userSavedPreferences = loadJsonSavedConfiguration(UserPreferencesFullPath);
+        // (Some of this has been moved to the hotkey hook handler)
         
         if (_classIgnoreList.Contains(windowToMove.Class, StringComparer.InvariantCultureIgnoreCase))
         {
@@ -207,7 +215,7 @@ public class App : Application
             
         if (windowClassInSaved(windowToMove))
         {
-            incrementMatchingWindowToNextPosition(windowToMove, userSavedPreferences);
+            incrementMatchingWindowToNextPosition(windowToMove, _userSavedPreferences);
         }
         else
         {
@@ -264,13 +272,8 @@ public class App : Application
     {
         var hexPid = ProcessIdHelpers.LongIdToHexLeadingZero(windowPid);
         
-        if (_logger is null ||
-            _shellCommandWrapper is null)
-        {
-            throw new NullReferenceException($"_logger or _shellCommandWrapper was null in {nameof(OnFrameworkInitializationCompleted)}");
-        }
-        
-        _shellCommandWrapper.RunInShell(
+        // Already checked for null in 
+        _shellCommandWrapper!.RunInShell(
             "wmctrl", $"-ir {hexPid} -e 0,{newPosition.Left},{newPosition.Top},{newPosition.Width},{newPosition.Height}");
     }
     

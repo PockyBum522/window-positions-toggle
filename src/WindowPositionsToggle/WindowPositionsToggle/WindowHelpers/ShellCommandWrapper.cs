@@ -6,7 +6,7 @@ public class ShellCommandWrapper
 {
     private readonly ILogger _logger;
     
-    private Process _toolProcess = new();
+    private readonly Process _toolProcess = new();
     
     public ShellCommandWrapper(ILogger logger)
     {

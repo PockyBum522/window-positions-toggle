@@ -143,19 +143,24 @@ public class App : Application
 
     private void HookOnKeyReleased(object? sender, KeyboardHookEventArgs e)
     {
-        if (e.Data.KeyCode is KeyCode.VcLeftAlt or KeyCode.VcRightAlt)
-        {
-            _isAltKeyPressedDown = false;
+        if (e.Data.KeyCode is not (KeyCode.VcLeftAlt and not KeyCode.VcRightAlt)) return;
+        
+        _isAltKeyPressedDown = false;
             
-            // Reload this for next time
-            _userSavedPreferences = loadJsonSavedConfiguration(UserPreferencesFullPath);
-        }
+        // Reload this for next time
+        _userSavedPreferences = loadJsonSavedConfiguration(UserPreferencesFullPath);
     }
 
     private void HookOnKeyPressed(object? sender, KeyboardHookEventArgs e)
     {
         // _hotkeyAltEventsRunTimer.Restart();
+
+        Console.WriteLine($"KeyCode: {e.Data.KeyCode} | _isAltKeyPressedDown: {_isAltKeyPressedDown}");
         
+        // Exit this method if it's not any keys involved in our hotkey, Alt + R
+        if (e.Data.KeyCode is not KeyCode.VcLeftAlt and not KeyCode.VcRightAlt and not KeyCode.VcR) return;
+        
+        // Handle 
         if (e.Data.KeyCode is KeyCode.VcLeftAlt or KeyCode.VcRightAlt)
         {
             _isAltKeyPressedDown = true;
@@ -163,12 +168,10 @@ public class App : Application
             // Handle whatever we can in the alt portion to try and make things faster
             _userSavedPreferences ??= loadJsonSavedConfiguration(UserPreferencesFullPath);
             
-            // _windowController is checked for null in OnFrameworkInitializationCompleted()
-            _activeWindow = _windowController!.GetActiveWindowInformation();
-            
             // Console.WriteLine($"[TIMER] Took: {_hotkeyAltEventsRunTimer.Elapsed.Milliseconds}ms to run all preparation for window work on alt press");
         }
-
+        
+        // Make sure we only continue if 
         if (e.Data.KeyCode != KeyCode.VcR) return;
         
         if (!_isAltKeyPressedDown) return;
@@ -176,6 +179,9 @@ public class App : Application
         // Beyond here should be Alt + R
         
         // _hotkeyWindowWorkEventsRunTimer.Restart();
+        
+        // _windowController is checked for null in OnFrameworkInitializationCompleted()
+        _activeWindow = _windowController!.GetActiveWindowInformation();
         
         moveWindowToAppropriateLocation(_activeWindow!);
 

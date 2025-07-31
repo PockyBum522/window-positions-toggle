@@ -1,9 +1,9 @@
 # window-positions-toggle
-This is a window size/position helper. You can set up size/location information for different applications and then pressing a hotkey will moved the focused window to the next predefined size/location for that application.
+This is a window size/position helper. You can set up size+location information for different applications and then pressing a hotkey will moved the focused window to the next predefined size/location for that application.
 
-You can have multiple preset sizes and locations, so if there are a few places/sizes that you tend to use a particular applcation at, you just press the hotkey a few times and instantly it is where you want it. 
+You can have multiple preset size+locations for each app, so if there are a few places/sizes that you tend to use a particular applcation at, you just press the hotkey a few times and instantly it is where you want it. This is also useful for if you have multiple windows of the same application open. You can focus one and press the hotkey once, then focus the other one, and press it twice, and they can be at two different size+locations extremely quickly.
 
-If a window is not already at one of the saved size+locations, it will snap to the first one. After that, it will snap to the next saved size + location. When it gets to the end of the list of saved size+locations, it snaps back to the first one. This means you can move a window wherever you want and resize it however you want to work with it temporarily, then have it back how you like it in a keypress or two.
+If a window is not already at one of the saved size+locations, it will snap to the first one. After that, it will snap to the next saved size+location. When it gets to the end of the list of saved size+locations, it cycles and snaps back to the first one. This means you can move a window wherever you want and resize it however you want to work with it temporarily, then have it back exactly where you like instantly just by hitting a hotkey.
 
 Works with cinnamon well. *Should* work with most X11-based WMs.
 

@@ -16,6 +16,7 @@ public class DependencyInjectionRoot
         .WriteTo.File(
             Path.Join(ApplicationPaths.ApplicationLoggingDirectory, "log_.log"), rollingInterval: RollingInterval.Day)
         .WriteTo.Debug()
+        .WriteTo.Console()
         .CreateLogger();
     
     private static readonly ContainerBuilder DependencyContainerBuilder = new ();
@@ -42,6 +43,8 @@ public class DependencyInjectionRoot
         
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             DependencyContainerBuilder.RegisterType<MicrosoftWindowController>().As<IWindowLowLevelController>();
+        
+        DependencyContainerBuilder.RegisterType<ShellCommandWrapper>().AsSelf().SingleInstance();
         
         // Setup UI (Views and ViewModels) 
         DependencyContainerBuilder.RegisterType<MainViewModel>().AsSelf().SingleInstance();

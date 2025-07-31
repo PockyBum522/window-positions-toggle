@@ -20,7 +20,7 @@ public class App : Application
     private static ILogger? _logger;
     private static IWindowLowLevelController? _windowController;
     
-    private static readonly ShellCommandWrapper _shellCommandWrapper = new(_logger);
+    private static ShellCommandWrapper _shellCommandWrapper;
     
     private static List<string> _classIgnoreList = new(){ "nemo-desktop.Nemo-desktop" };
     
@@ -38,8 +38,11 @@ public class App : Application
         await using var scope = dependencyContainer.BeginLifetimeScope();
         
         _logger = scope.Resolve<ILogger>();
+        _shellCommandWrapper = scope.Resolve<ShellCommandWrapper>();
         
         _logger.Information("Application started. About to fire up MainWindow if IClassicDesktopStyleApplicationLifetime or MainView if ISingleViewApplicationLifetime");
+        
+        _logger.Information("Looking for settings file at: {UserPrefsFullPath}", UserPreferencesFullPath);
         
         foreach (var arg in fullArguments)
             Console.WriteLine($"Arg: {arg}");
@@ -323,6 +326,8 @@ public class App : Application
         var windowInformationFilePath = UserPreferencesFullPath;
         
         var windowJson = JsonConvert.SerializeObject(listToSave, Formatting.Indented);
+
+        _logger?.Information("Saving example config file to: {WindowInformationFilePath}", windowInformationFilePath);
         
         File.WriteAllText(windowInformationFilePath, windowJson);
     }

@@ -39,10 +39,10 @@ public class DependencyInjectionRoot
         };
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            DependencyContainerBuilder.RegisterType<LinuxWindowController>().As<IWindowLowLevelController>();
+            DependencyContainerBuilder.RegisterType<LinuxWindowController>().As<IWindowLowLevelController>().SingleInstance();
         
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            DependencyContainerBuilder.RegisterType<MicrosoftWindowController>().As<IWindowLowLevelController>();
+            DependencyContainerBuilder.RegisterType<MicrosoftWindowController>().As<IWindowLowLevelController>().SingleInstance();
         
         DependencyContainerBuilder.RegisterType<ShellCommandWrapper>().AsSelf().SingleInstance();
         

@@ -20,7 +20,7 @@ public class App : Application
     private static ILogger? _logger;
     private static IWindowLowLevelController? _windowController;
     
-    private static ShellCommandWrapper _shellCommandWrapper;
+    private static ShellCommandWrapper? _shellCommandWrapper;
     
     private static List<string> _classIgnoreList = new(){ "nemo-desktop.Nemo-desktop" };
     
@@ -33,12 +33,18 @@ public class App : Application
     {
         var fullArguments = Environment.GetCommandLineArgs();
   
-        var dependencyContainer = await DependencyInjectionRoot.GetBuiltContainer();
+        var dependencyContainer = DependencyInjectionRoot.GetBuiltContainer();
 
         await using var scope = dependencyContainer.BeginLifetimeScope();
         
         _logger = scope.Resolve<ILogger>();
         _shellCommandWrapper = scope.Resolve<ShellCommandWrapper>();
+
+        if (_logger is null ||
+            _shellCommandWrapper is null)
+        {
+            throw new NullReferenceException($"_logger or _shellCommandWrapper was null in {nameof(OnFrameworkInitializationCompleted)}");
+        }
         
         _logger.Information("Application started. About to fire up MainWindow if IClassicDesktopStyleApplicationLifetime or MainView if ISingleViewApplicationLifetime");
         

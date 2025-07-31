@@ -18,11 +18,11 @@ public partial class MainViewModel(ILogger? loggerApplication = null) : Observab
     [ObservableProperty] private int _scalingValue;
 
     [RelayCommand]
-    private async Task whenViewLoaded(object? plot)
+    private void whenViewLoaded(object? plot)
     {
         if (loggerApplication is null)
         {
-            loggerApplication?.Error("In WhenViewLoaded() for RotovapControlViewModel, plot is null || _motorController is null || RotovapControllerState is null || _fileHelpers is null || _demoProgramGenerator is null");
+            loggerApplication?.Error("In WhenViewLoaded() for MainViewModel, loggerApplication is null");
             
             throw new NullReferenceException();
         }

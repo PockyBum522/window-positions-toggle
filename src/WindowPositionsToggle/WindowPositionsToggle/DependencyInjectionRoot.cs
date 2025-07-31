@@ -21,7 +21,7 @@ public class DependencyInjectionRoot
     
     private static readonly ContainerBuilder DependencyContainerBuilder = new ();
     
-    public static async Task<IContainer> GetBuiltContainer()
+    public static IContainer GetBuiltContainer()
     {
         DependencyContainerBuilder.RegisterInstance(LoggerApplication).As<ILogger>().SingleInstance();
         

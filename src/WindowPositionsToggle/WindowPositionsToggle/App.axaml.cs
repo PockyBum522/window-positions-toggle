@@ -154,7 +154,7 @@ public class App : Application
 
     private void HookOnKeyPressed(object? sender, KeyboardHookEventArgs e)
     {
-        _hotkeyAltEventsRunTimer.Restart();
+        // _hotkeyAltEventsRunTimer.Restart();
         
         if (e.Data.KeyCode is KeyCode.VcLeftAlt or KeyCode.VcRightAlt)
         {
@@ -166,7 +166,7 @@ public class App : Application
             // _windowController is checked for null in OnFrameworkInitializationCompleted()
             _activeWindow = _windowController!.GetActiveWindowInformation();
             
-            Console.WriteLine($"[TIMER] Took: {_hotkeyAltEventsRunTimer.Elapsed.Milliseconds}ms to run all preparation for window work on alt press");
+            // Console.WriteLine($"[TIMER] Took: {_hotkeyAltEventsRunTimer.Elapsed.Milliseconds}ms to run all preparation for window work on alt press");
         }
 
         if (e.Data.KeyCode != KeyCode.VcR) return;
@@ -174,11 +174,12 @@ public class App : Application
         if (!_isAltKeyPressedDown) return;
         
         // Beyond here should be Alt + R
-        _hotkeyWindowWorkEventsRunTimer.Restart();
+        
+        // _hotkeyWindowWorkEventsRunTimer.Restart();
         
         moveWindowToAppropriateLocation(_activeWindow!);
 
-        Console.WriteLine($"[TIMER] Took: {_hotkeyWindowWorkEventsRunTimer.Elapsed.Milliseconds}ms to run all window work");
+        // Console.WriteLine($"[TIMER] Took: {_hotkeyWindowWorkEventsRunTimer.Elapsed.Milliseconds}ms to run all window work");
     }
 
     private static void printWindowInfo(WindowInformation windowToPrint)

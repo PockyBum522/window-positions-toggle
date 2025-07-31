@@ -1,5 +1,11 @@
 # window-positions-toggle
-Using wmctrl to snap my windows into the positions I want automatically, depending on what window is currently selected. Works with cinnamon well.
+This is a window size/position helper. You can set up size/location information for different applications and then pressing a hotkey will moved the focused window to the next predefined size/location for that application.
+
+You can have multiple preset sizes and locations, so if there are a few places/sizes that you tend to use a particular applcation at, you just press the hotkey a few times and instantly it is where you want it. 
+
+If a window is not already at one of the saved size+locations, it will snap to the first one. After that, it will snap to the next saved size + location. When it gets to the end of the list of saved size+locations, it snaps back to the first one. This means you can move a window wherever you want and resize it however you want to work with it temporarily, then have it back how you like it in a keypress or two.
+
+Works with cinnamon well. *Should* work with most X11-based WMs.
 
 
 # Usage

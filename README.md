@@ -33,6 +33,17 @@ I may just move everything to be per-window class offsets in the JSON
 
 NOTE: When dpi scaling, things go sideways. Read the JSON examples carefully. You can use ExtraTopOffset and ExtraLeftOffset to correct for this per-machine.
 
+
+# Hotkey
+
+Hotkey is currently Alt + R. To set up a different hotkey you will need to change the contents of:
+
+private void HookOnKeyReleased(object? sender, KeyboardHookEventArgs e){}
+private void HookOnKeyPressed(object? sender, KeyboardHookEventArgs e){}
+
+in App.axaml.cs
+
+
 # Installation
 
 Install below dependencies. Update _userPreferencesPath at the top of Program.cs to point to where you want it, this is where the configuration JSON dotfile will be stored/loaded from.

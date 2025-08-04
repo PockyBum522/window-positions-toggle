@@ -14,7 +14,7 @@ Note: After building, you'll need to run the app with something like "/usr/sbin/
 
 1. Install dependencies
 
-2. Set up a configuration JSON file as directed below, you can run the app with "-v" and it will wait 3 seconds then tell you what the class name of the active window is, and also give you Top, Left, Width, Height attributes for the active window so you can easily add them to your JSON config file.
+2. Set up a configuration JSON file as directed below, you can run the app with "-cli-select-win" and it will wait 3 seconds then tell you what the class name of the active window is, and also give you Top, Left, Width, Height attributes for the active window so you can easily add them to your JSON config file.
 
 Note: I may need to add offsets for these. They may be off by the width of the drop shadows that cinnamon is rendering. They will be close to what you want, anyways.
 

@@ -7,6 +7,7 @@ using Avalonia.Markup.Xaml;
 using Newtonsoft.Json;
 using SharpHook;
 using SharpHook.Data;
+using WindowPositionsToggle.Interfaces;
 using WindowPositionsToggle.Models;
 using WindowPositionsToggle.Views;
 using WindowPositionsToggle.WindowHelpers;
@@ -40,6 +41,10 @@ public class App : Application
 
     public override async void OnFrameworkInitializationCompleted()
     {
+ Console.WriteLine();
+        Console.WriteLine("OS Detected: Linux");
+        Console.WriteLine();
+        
         var benchmarkTimer = new Stopwatch();
         benchmarkTimer.Start();
 
@@ -55,7 +60,10 @@ public class App : Application
         
         _logger = scope.Resolve<ILogger>();
         _shellCommandWrapper = scope.Resolve<ShellCommandWrapper>();
-
+        
+        if (!File.Exists(UserPreferencesFullPath))
+            saveExampleWindowStateConfig();
+        
         _userSavedPreferences = loadJsonSavedConfiguration(UserPreferencesFullPath);
         
         if (_logger is null ||
@@ -73,21 +81,16 @@ public class App : Application
         
         foreach (var arg in fullArguments)
             Console.WriteLine($"Arg: {arg}");
-
-        if (!File.Exists(UserPreferencesFullPath))
-            saveDummyWindowState();
-        
+    
         _windowController = scope.Resolve<IWindowLowLevelController>();
-        
-        var activeWindow = _windowController.GetActiveWindowInformation();
-
+    
         Console.WriteLine($"[TIMER] After gotten active window info: {benchmarkTimer.Elapsed.Milliseconds}ms");
         
         if (fullArguments.Contains("-cli-select-win", StringComparer.InvariantCultureIgnoreCase))
         {
             await Task.Delay(3000);
             
-            activeWindow = _windowController.GetActiveWindowInformation();
+            var activeWindow = _windowController.GetActiveWindowInformation();
             
             printWindowInfo(activeWindow);
             
@@ -107,7 +110,7 @@ public class App : Application
             {
                 singleViewPlatform.MainView = scope.Resolve<MainView>();
             }
-
+    
             base.OnFrameworkInitializationCompleted();
             
             return;
@@ -121,7 +124,7 @@ public class App : Application
         // Console.WriteLine($"[TIMER] Moved window: {benchmarkTimer.Elapsed.Milliseconds}ms");
         //
         // Environment.Exit(0);
-
+    
         Console.WriteLine("Starting hotkey hook listener");        
         var hook = new TaskPoolGlobalHook();
         
@@ -139,8 +142,9 @@ public class App : Application
         Console.WriteLine("");
         Console.WriteLine("Press enter to exit...");
         Console.ReadLine();
+        
+        Environment.Exit(0);
     }
-
     private void HookOnKeyReleased(object? sender, KeyboardHookEventArgs e)
     {
         if (e.Data.KeyCode is not (KeyCode.VcLeftAlt and not KeyCode.VcRightAlt)) return;
@@ -183,7 +187,7 @@ public class App : Application
         // _windowController is checked for null in OnFrameworkInitializationCompleted()
         _activeWindow = _windowController!.GetActiveWindowInformation();
         
-        moveWindowToAppropriateLocation(_activeWindow!);
+        moveWindowToAppropriateLocation(_activeWindow);
 
         // Console.WriteLine($"[TIMER] Took: {_hotkeyWindowWorkEventsRunTimer.Elapsed.Milliseconds}ms to run all window work");
     }
@@ -377,14 +381,20 @@ public class App : Application
     
     private static List<SavedWindowPreferences> loadJsonSavedConfiguration(string configurationFilePath)
     {
+        if (_logger is null) throw new NullReferenceException($"_logger was null in {nameof(loadJsonSavedConfiguration)}"); 
+        
+        _logger.Information("Loading json saved configuration from: {Path}", configurationFilePath);
+        
         var jsonString = File.ReadAllText(configurationFilePath);
         
         var returnWindowPreferences = JsonConvert.DeserializeObject<List<SavedWindowPreferences>>(jsonString);
 
+        _logger.Debug("Checking if loaded anything for returnWindowPreferences: {@ReturnPrefs}", returnWindowPreferences);
+        
         return returnWindowPreferences ?? [];
     }
     
-    private static void saveDummyWindowState()
+    private static void saveExampleWindowStateConfig()
     {
         var listToSave = new List<SavedWindowPreferences>();
 
@@ -403,7 +413,6 @@ public class App : Application
         
         listToSave.Add(dummyWindow01);
         
-        
         var dummyWindow02 = new SavedWindowPreferences();
         
         dummyWindow02.TitlePattern = "Title Pattern Dummy Window 02 Title";
@@ -417,7 +426,6 @@ public class App : Application
         
         listToSave.Add(dummyWindow02);
 
-
         var windowInformationFilePath = UserPreferencesFullPath;
         
         var windowJson = JsonConvert.SerializeObject(listToSave, Formatting.Indented);
@@ -427,3 +435,4 @@ public class App : Application
         File.WriteAllText(windowInformationFilePath, windowJson);
     }
 }
+

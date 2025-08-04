@@ -6,19 +6,20 @@ public static class ApplicationPaths
 {
     static ApplicationPaths()
     {
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            var basePath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        var basePath = "";
         
-            setAllPaths(basePath);
+        if (Environment.UserName == "david")
+        {
+            // Hardcoding my path here
+            basePath = "/media/secondary/repos/linux-files/configuration/dotfiles/";
+        }
+        else
+        {
+            // This handles both Linux and Windows
+            basePath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
         }
         
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-        {
-            var basePath = "/media/secondary/repos/linux-files/configuration/dotfiles/";
-            
-            setAllPaths(basePath);
-        }
+        setAllPaths(basePath);
         
         if (string.IsNullOrWhiteSpace(ApplicationLoggingDirectory) ||
             string.IsNullOrWhiteSpace(UserSettingsDirectory))

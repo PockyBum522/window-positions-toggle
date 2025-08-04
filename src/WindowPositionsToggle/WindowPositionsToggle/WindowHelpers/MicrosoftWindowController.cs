@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using System.Text;
+using WindowPositionsToggle.Interfaces;
 using WindowPositionsToggle.Models;
 
 namespace WindowPositionsToggle.WindowHelpers;
@@ -8,6 +9,14 @@ public class MicrosoftWindowController() : IWindowLowLevelController
 {
     public WindowInformation GetActiveWindowInformation()
     {
+        var activeWindowHandle = GetForegroundWindow();
+
+        var returnWindowInformation =
+            new WindowInformation(activeWindowHandle)
+            {
+                Title = getActiveWindowTitle()
+            };
+        
         // This all works:
         //      var hWnd = FindWindow("Notepad", null);
         //
@@ -25,10 +34,10 @@ public class MicrosoftWindowController() : IWindowLowLevelController
         // This works too:
         //      var windowTitle = getActiveWindowTitle();
         //      Console.WriteLine($"Active window title: {windowTitle}");
+
+        Console.WriteLine($"Active window handle: {activeWindowHandle}");
         
-        // Just testing
-        //return new WindowInformation(activeWindowHandle);
-        return new WindowInformation(0);
+        return returnWindowInformation;
     }
 
     private string getActiveWindowTitle()

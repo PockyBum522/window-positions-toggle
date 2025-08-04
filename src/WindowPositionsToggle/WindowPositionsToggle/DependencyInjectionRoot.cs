@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using Autofac;
+using WindowPositionsToggle.Interfaces;
 using WindowPositionsToggle.ViewModels;
 using WindowPositionsToggle.Views;
 using WindowPositionsToggle.WindowHelpers;
@@ -12,7 +13,7 @@ public class DependencyInjectionRoot
     public static readonly ILogger LoggerApplication = new LoggerConfiguration()
         .Enrich.WithProperty("WindowPositionsToggle", "SerilogWindowPositionsToggleContext")
         //.MinimumLevel.Information()
-        .MinimumLevel.Information()
+        .MinimumLevel.Debug()
         .WriteTo.File(
             Path.Join(ApplicationPaths.ApplicationLoggingDirectory, "log_.log"), rollingInterval: RollingInterval.Day)
         .WriteTo.Debug()

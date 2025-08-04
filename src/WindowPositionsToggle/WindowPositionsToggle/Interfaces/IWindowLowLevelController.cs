@@ -1,6 +1,6 @@
 using WindowPositionsToggle.Models;
 
-namespace WindowPositionsToggle.WindowHelpers;
+namespace WindowPositionsToggle.Interfaces;
 
 public interface IWindowLowLevelController
 {

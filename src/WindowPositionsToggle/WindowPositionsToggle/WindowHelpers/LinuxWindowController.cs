@@ -1,5 +1,6 @@
 using System.Linq;
 using Newtonsoft.Json;
+using WindowPositionsToggle.Interfaces;
 using WindowPositionsToggle.Models;
 
 namespace WindowPositionsToggle.WindowHelpers;

@@ -41,8 +41,6 @@ public static class AppInfo
             
             ApplicationLoggingDirectory = Path.Join(logBasePath, "application");
             
-            // TrackWeightsJsonFullPath = Path.Join(basePath, "known-track-weights.json");
-            
             Directory.CreateDirectory(ApplicationLoggingDirectory);
         }
 

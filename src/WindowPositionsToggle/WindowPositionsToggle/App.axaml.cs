@@ -28,8 +28,6 @@ public class App : Application
     private static List<string> _classIgnoreList = new(){ "nemo-desktop.Nemo-desktop" };
     
     private static bool _isAltKeyPressedDown;
-    private static Stopwatch _hotkeyAltEventsRunTimer = new();
-    private static Stopwatch _hotkeyWindowWorkEventsRunTimer = new();
 
     private static WindowInformation? _activeWindow;
     private static List<SavedWindowPreferences>? _userSavedPreferences;
@@ -41,7 +39,7 @@ public class App : Application
 
     public override async void OnFrameworkInitializationCompleted()
     {
- Console.WriteLine();
+        Console.WriteLine();
         Console.WriteLine("OS Detected: Linux");
         Console.WriteLine();
         

@@ -1,0 +1,69 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:WindowPositionsToggle.ViewModels"
+             xmlns:views="clr-namespace:WindowPositionsToggle.Views"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="WindowPositionsToggle.Views.SizePositionPickingView"
+             x:DataType="vm:SizePositionPickingViewModel">
+  <Design.DataContext>
+    <!-- This only sets the DataContext for the previewer in an IDE,
+         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+    <vm:SizePositionPickingViewModel />
+  </Design.DataContext>
+
+    <!-- Need to do row and column sizes other than the middle one manually because otherwise things will auto-resize 
+    and move things around that we don't want moved to compensate when the user drags -->
+    <Grid  Opacity="190">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="{Binding InsetTop, Mode=TwoWay}" />
+            <RowDefinition Height="4" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="4" />
+            <RowDefinition Height="{Binding InsetBottom, Mode=TwoWay}" />
+        </Grid.RowDefinitions>
+        
+        <Rectangle Grid.Row="0" Fill="DarkGray"/>
+        
+        <GridSplitter Grid.Row="1" Background="Black" ResizeDirection="Rows"/>
+        
+        <Grid Grid.Row="2">
+              <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="{Binding InsetLeft, Mode=TwoWay}" />
+                  <ColumnDefinition Width="4" />
+                  <ColumnDefinition Width="*" />
+                  <ColumnDefinition Width="4" />
+                  <ColumnDefinition Width="{Binding InsetRight, Mode=TwoWay}" />
+              </Grid.ColumnDefinitions>
+        
+            <Rectangle Grid.Column="0" Fill="DarkGray"/>
+        
+            <GridSplitter Grid.Column="1" Background="Black" ResizeDirection="Columns"/>
+            
+            <DockPanel Grid.Column="2" Background="Green" >
+                
+                <Button Content="Set Window Size/Position" 
+                        Command="{Binding SetWindowSizePositionCommand}"
+                        MaxWidth="200" 
+                        MaxHeight="50" 
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Opacity="100"
+                        Foreground="#EEEEEE"
+                        Background="#111111"/>
+                
+            </DockPanel>
+            
+            <GridSplitter Grid.Column="3" Background="Black" ResizeDirection="Columns"/>
+            
+            <Rectangle Grid.Column="4" Fill="DarkGray"/>
+            
+        </Grid>
+        
+        <GridSplitter Grid.Row="3" Background="Black" ResizeDirection="Rows"/>
+        
+        <Rectangle Grid.Row="4" Fill="DarkGray"/>
+    </Grid>
+    
+</UserControl>

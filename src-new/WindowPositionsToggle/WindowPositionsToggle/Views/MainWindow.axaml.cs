@@ -31,21 +31,21 @@ public partial class MainWindow : Window
         
         hook.KeyPressed += (object? sender, KeyboardHookEventArgs e) =>
         {
-            if (!_sizePickingWindow.IsVisible) return;
-            
-            // _hotkeyAltEventsRunTimer.Restart();
-
-            var currentKeyCode = e.Data.KeyCode;
-
-            const KeyCode needleKeyCode = KeyCode.VcEscape;
-            
-            Console.WriteLine($"v001 KeyCode: {currentKeyCode}");
-
-            // Exit this method if it's not any keys involved in our hotkey, Alt + R
-            if (currentKeyCode is not needleKeyCode) return;
-        
-            // Beyond here should be Escape
-            Dispatcher.UIThread.Invoke(_sizePickingWindow.Hide);
+            // if (!_sizePickingWindow.IsVisible) return;
+            //
+            // // _hotkeyAltEventsRunTimer.Restart();
+            //
+            // var currentKeyCode = e.Data.KeyCode;
+            //
+            // const KeyCode needleKeyCode = KeyCode.VcR;
+            //
+            // Console.WriteLine($"v001 KeyCode: {currentKeyCode}");
+            //
+            // // Exit this method if it's not any keys involved in our hotkey, Alt + R
+            // if (currentKeyCode is not needleKeyCode) return;
+            //
+            // // Beyond here should be 
+            // Dispatcher.UIThread.Invoke(_sizePickingWindow.Hide);
         };
         
         Task.Run(() => { hook.RunAsync(); });
@@ -62,7 +62,17 @@ public partial class MainWindow : Window
                 
                 Menu = [
                     new NativeMenuItem                    {
-                        Header = "Set Window Size/Position",
+                        Header = "Save Current Window Size/Position",
+                        Command = new RelayCommand(() =>
+                        {
+                            _sizePickingWindow.Opacity = 0;
+                            
+                           
+                        })
+                    },
+                    
+                    new NativeMenuItem                    {
+                        Header = "Set Window Size/Position Manually",
                         Command = new RelayCommand(() =>
                         {
                             _sizePickingWindow.Opacity = 0;
@@ -97,6 +107,22 @@ public partial class MainWindow : Window
                             };
                             
                             _sizePickingWindow.Show();
+                        })
+                    },
+                    
+                    new NativeMenuItemSeparator(),
+                    
+                    new NativeMenuItem                    {
+                        Header = "Debug - Get Active Window Size/Position Data (WITHOUT Offset)",
+                        Command = new RelayCommand(() => 
+                        { 
+                        })
+                    },
+                    
+                    new NativeMenuItem                    {
+                        Header = "Debug - Get Active Window Size/Position Data (WITH Offset)",
+                        Command = new RelayCommand(() => 
+                        { 
                         })
                     },
                     
